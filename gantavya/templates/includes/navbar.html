@@ -1,0 +1,35 @@
+<div class="flex w-full justify-between py-8 px-16">
+	<div class="flex-none">
+		Logo
+	</div>
+
+	{% if user.is_authenticated %}
+	<p>
+		Profile Picture
+	</p>
+
+	<a href="{% url 'logout' %}">
+		<button class="btn-primary">
+			Logout
+		</button>
+	</a>
+
+	{% else %}
+	<div>
+		<div class="flex justify-end gap-4">
+			<a href="{% url 'login' %}">
+				<button class="btn-primary">
+					Login
+				</button>
+			</a>
+
+			<a href="{% url 'register' %}">
+				<button class="btn-primary">
+					Register
+				</button>
+			</a>
+		</div>
+	</div>
+
+	{% endif %}
+</div>
