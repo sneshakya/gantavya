@@ -1,0 +1,16 @@
+{% extends "includes/layout.html" %}
+
+{% load static %}
+
+{% block title %}
+Explore
+{% endblock %}
+
+{% block content %}
+<div class="mx-16 h-screen">
+	<h1 class="py-8 text-2xl font-bold">
+		Explore Your Trips Here
+	</h1>
+	{{ trips }}
+</div>
+{% endblock content %}

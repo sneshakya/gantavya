@@ -1,18 +1,27 @@
 <div class="flex w-full justify-between py-8 px-16">
-	<div class="flex-none">
+	<a href="/"
+		class="flex-none"
+	>
 		Logo
-	</div>
+	</a>
 
 	{% if user.is_authenticated %}
-	<p>
-		Profile Picture
-	</p>
+	<div class="flex gap-8">
+		<a href="#">
+			<img height="16"
+				width="16"
+				src="#"
+				alt="{{ user.username }}"
+				class="rounded-full"
+			>
+		</a>
 
-	<a href="{% url 'logout' %}">
-		<button class="btn-primary">
-			Logout
-		</button>
-	</a>
+		<a href="{% url 'logout' %}">
+			<button class="btn-primary">
+				Logout
+			</button>
+		</a>
+	</div>
 
 	{% else %}
 	<div>

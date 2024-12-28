@@ -9,6 +9,9 @@ from .forms import LoginForm, UserSignUpForm, ClientSignUpForm
 def login_view( request ):
 	msg = None
 	form = LoginForm( request.POST or None )
+ 
+	if request.user.is_authenticated:
+		return redirect( "/" )
 
 	if request.method == "POST":
 		if form.is_valid():
@@ -19,6 +22,9 @@ def login_view( request ):
 
 			if user is not None:
 				login( request, user )
+    
+				if user.is_superuser:
+					return redirect( "/admin/" )
 
 				return redirect( "/" )
 			msg = "Invalid credentials"
@@ -31,11 +37,11 @@ def login_view( request ):
 def register_user( request ):
 	msg = None
 	success = False
+ 
+	if request.user.is_authenticated:
+		return redirect( "/" )
 
 	if request.method == "POST":
-		if request.user.is_authenticated:
-			return redirect( "/" )
-
 		form = UserSignUpForm( request.POST )
 
 		if form.is_valid():
