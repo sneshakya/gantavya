@@ -14,12 +14,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'), )
 """
+from allauth.socialaccount.providers.google.views import oauth2_login, \
+	oauth2_callback
 from django.urls import path
 
 from . import views
 
+
 urlpatterns = [
-	path( 'login/', views.login_view, name = "login" ),
-	path( 'register/', views.register_user, name = "register" ),
-	path( 'logout/', views.logout_user, name = "logout" ),
+	path( 'accounts/google/login/', oauth2_login, name='google_login' ),
+	path( 'accounts/google/login/callback/', oauth2_callback,
+	      name='google_callback'
+	      ),
+
+	path( 'login/', views.login_view, name="login" ),
+	path( 'register/', views.register_user, name="register" ),
+	path( 'logout/', views.logout_user, name="logout" ),
 ]
