@@ -1,0 +1,44 @@
+{% extends "includes/layout/homepage.html" %}
+
+
+{% block title %}
+Destination
+{% endblock title %}
+
+
+{% block inner_content %}
+<div class="mx-8 mb-16 sm:mx-16 lg:mx-48">
+	<img class="h-48 w-full object-cover"
+		src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fgeo.img.pmdstatic.net%2Ffit%2Fhttp.3A.2F.2Fprd2-bone-image.2Es3-website-eu-west-1.2Eamazonaws.2Ecom.2FGEO.2Fvar.2Fgeo.2Fstorage.2Fimages.2Fmedia.2Fimages.2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.2F2483828-1-fre-FR.2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.2Ejpg%2F1280x720%2Fbackground-color%2Fffffff%2Fquality%2F70%2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.jpg&f=1&nofb=1&ipt=3e19d245f7e6760535b731738b9e64ef45b4bf9c3988fed1c8ab986f28914c92&ipo=images"
+		alt=""
+	>
+
+	<div class="pt-8 px-8 flex flex-col">
+		<div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
+			{{ destination.city }}
+		</div>
+		<p class="block mt-1 text-lg leading-tight font-medium text-black"
+		>
+			{{ destination.name }}
+		</p>
+		<p class="block mt-1 text-lg leading-tight font-medium text-slate-700"
+		>
+			{{ destination.location }}
+		</p>
+		<p class="block mt-1 text-sm leading-tight text-slate-600"
+		>
+			{{ destination.longitude }}, {{ destination.latitude }}
+		</p>
+		<p class="mt-2 text-slate-500">
+			{{ destination.description }}
+		</p>
+	</div>
+
+	<div class="my-8 text-center">
+		<a class="btn-primary"
+			href="{% url 'destination' %}"
+		>Back To Destination</a>
+	</div>
+</div>
+
+{% endblock inner_content %}

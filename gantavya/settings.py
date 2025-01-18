@@ -94,6 +94,7 @@ INSTALLED_APPS = [
 	'allauth.socialaccount.providers.google',
 
 	'accounts',
+	'trips'
 ]
 
 MIDDLEWARE = [

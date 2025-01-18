@@ -1,44 +1,101 @@
-<div class="flex w-full justify-between py-8 px-16">
+<div class="flex w-full justify-between px-8 py-8 sm:px-16">
 	<a href="/"
 		class="flex-none"
 	>
 		Logo
 	</a>
-
-	{% if user.is_authenticated %}
-	<div class="flex gap-8">
-		<a href="#">
-			<img height="16"
-				width="16"
-				src="#"
-				alt="{{ user.username }}"
-				class="rounded-full"
-			>
-		</a>
-
-		<a href="{% url 'logout' %}">
-			<button class="btn-primary">
-				Logout
-			</button>
-		</a>
-	</div>
-
-	{% else %}
-	<div>
-		<div class="flex justify-end gap-4">
-			<a href="{% url 'login' %}">
-				<button class="btn-primary">
-					Login
-				</button>
-			</a>
-
-			<a href="{% url 'register' %}">
-				<button class="btn-primary">
-					Register
-				</button>
-			</a>
+	<div class="flex items-center gap-8">
+		<div class="text-xl hover:underline">
+			<a href="">Home</a>
 		</div>
-	</div>
+		<div class="text-xl hover:underline">
+			<a href="">Explore</a>
+		</div>
+		<div class="text-xl hover:underline">
+			<a href="">About</a>
+		</div>
+		{% if user.is_authenticated %}
 
-	{% endif %}
+		<div class="relative">
+			<button onclick="toggle_dropdown()"
+				class="bg-lime-400 flex gap-4 items-center border rounded-full p-4 transition hover:bg-lime-300 active:bg-lime-400"
+			>
+				<img src="#"
+					class=""
+					alt="{{ user.username }}"
+				>
+				<i class="fa-solid fa-caret-down"></i>
+			</button>
+			<!-- Dropdown Menu -->
+			<div id="profile-dropdown"
+				class="hidden absolute right-0 mt-3 w-48 bg-white border
+								rounded-lg shadow-md"
+			>
+				<ul class="py-2 text-gray-700">
+					<li>
+						<a href="#"
+							class="block px-4 py-2 transition hover:bg-lime-400"
+						>
+							Profile
+						</a>
+					</li>
+					<li>
+						<a href="#"
+							class="block px-4 py-2 transition hover:bg-lime-400"
+						>
+							Settings
+						</a>
+					</li>
+
+					<li>
+						<hr class="my-1">
+					</li>
+					<li>
+						<a href="{% url 'logout' %}"
+							class="block px-4 py-2 transition hover:bg-lime-400"
+						>
+							Logout
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		{% else %}
+		<div>
+			<div class="flex justify-end gap-4">
+				<a href="{% url 'login' %}">
+					<button class="btn-primary">
+						Login
+					</button>
+				</a>
+
+				<a href="{% url 'register' %}">
+					<button class="btn-primary">
+						Register
+					</button>
+				</a>
+			</div>
+		</div>
+
+		{% endif %}
+	</div>
 </div>
+
+{% block javascript %}
+<script>
+	var toggle_dropdown = () => {
+		let dropdown = document.getElementById("profile-dropdown");
+		dropdown.classList.toggle("hidden");
+    };
+
+	document.addEventListener("click", function (event) {
+		let dropdown = document.getElementById("profile-dropdown");
+		let button = document.querySelector("button[onclick='toggle_dropdown()']");
+
+		if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+			dropdown.classList.add("hidden");
+		}
+	});
+</script>
+{% endblock javascript %}

@@ -1,0 +1,68 @@
+{% extends "includes/layout.html" %}
+
+{% load static %}
+
+{% block title %}
+Homepage
+{% endblock title %}
+
+{% block content %}
+
+<div class="w-full">
+	<div class="w-full py-16 sm:px-16">
+		<div class="mb-8 font-bold text-2xl text-center">
+			Search Trip of your Choice
+		</div>
+
+		<div class="flex justify-center gap-4 mb-4 font-medium">
+			<div class="py-2 px-4 hover:underline hover:text-lime-700">
+				<a href="{% url 'destination' %}">
+					Destinations
+				</a>
+			</div>
+
+			<div class="py-2 px-4 hover:underline hover:text-lime-700">
+				<a href="{% url 'explore' %}?q=HotelAndHomestays">
+					Hotels & Homestays
+				</a>
+			</div>
+
+			<div class="py-2 px-4 hover:underline hover:text-lime-700">
+				<a href="{% url 'explore' %}?q=Activity">
+					Activity
+				</a>
+			</div>
+
+			<div class="py-2 px-4 hover:underline hover:text-lime-700">
+				<a href="{% url 'explore' %}?q=Packages">
+					Vacation Packages
+				</a>
+			</div>
+		</div>
+
+		<div class="flex justify-center gap-8 w-full">
+			<div class="w-1/3 flex gap-4 sm:w-1/2">
+				<input class="w-full border-2 rounded-full active:border-lime-700"
+					type="text"
+					id="search-bar"
+				>
+				<a class="flex items-center cursor-pointer"
+					id="search-button"
+					href="{% url 'explore'%}"
+				>
+					<i
+						class="fa-solid fa-magnifying-glass hover:text-lime-700"
+					></i>
+				</a>
+			</div>
+		</div>
+	</div>
+
+
+	{% block inner_content %}
+	{% endblock inner_content %}
+
+</div>
+
+{% endblock content %}
+

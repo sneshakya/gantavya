@@ -1,4 +1,4 @@
-{% extends "includes/layout.html" %}
+{% extends "includes/layout/homepage.html" %}
 
 {% load static %}
 
@@ -6,11 +6,11 @@
 Explore
 {% endblock %}
 
-{% block content %}
+{% block inner_content %}
 <div class="mx-16 h-screen">
 	<h1 class="py-8 text-2xl font-bold">
 		Explore Your Trips Here
 	</h1>
 	{{ trips }}
 </div>
-{% endblock content %}
+{% endblock inner_content %}
