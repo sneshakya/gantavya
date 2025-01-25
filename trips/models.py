@@ -7,7 +7,9 @@ from accounts.models import CustomUser
 class Destination( models.Model ):
 	name = models.CharField( max_length=100 )
 	description = models.TextField( blank=True )
-	image = models.ImageField( upload_to='images/', blank=True )
+	image = models.ImageField( upload_to='images/destination/',
+	                           default='images/destination/default.jpg'
+	                           )
 	longitude = models.DecimalField( max_digits=10, decimal_places=6 )
 	latitude = models.DecimalField( max_digits=10, decimal_places=6 )
 	city = models.CharField( max_length=100 )
@@ -22,7 +24,9 @@ class Trip( models.Model ):
 	title = models.CharField( max_length=100 )
 	destination = models.ForeignKey( Destination, on_delete=models.CASCADE )
 	description = models.TextField( blank=True )
-	image = models.ImageField( upload_to='images/', blank=True )
+	image = models.ImageField( upload_to='images/trip/',
+	                           default='images/trip/default.jpg'
+	                           )
 	price = models.DecimalField( max_digits=10, decimal_places=2 )
 
 

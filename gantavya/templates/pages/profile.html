@@ -1,0 +1,54 @@
+{% extends "includes/layout.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mx-48">
+	<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+		<!-- Profile Sidebar -->
+		<div class="bg-white rounded-lg shadow p-6">
+			<div class="text-center mb-4">
+				<img src="{% static 'images/user/default-avatar.png' %}"
+					alt="Profile"
+					class="w-24 h-24 rounded-full mx-auto"
+				>
+				<h2 class="text-xl font-bold mt-4">
+					Hi, {{ user.first_name }}
+				</h2>
+			</div>
+			<hr>
+			<ul class="mt-6 space-y-4">
+				<li>
+					<a href="#"
+						class="text-gray-800 hover:text-purple-600"
+					>
+						Overview
+					</a>
+				</li>
+				<li>
+					<a href="#"
+						class="text-gray-800 hover:text-purple-600"
+					>
+						Settings
+					</a>
+				</li>
+				<li>
+					<a href="#"
+						class="text-gray-800 hover:text-purple-600"
+					>
+						Billing
+					</a>
+				</li>
+				<li>
+					<a href="{% url 'logout' %}"
+						class="text-gray-800 hover:text-purple-600"
+					>
+						Logout
+					</a>
+				</li>
+			</ul>
+		</div>
+
+	</div>
+</div>
+
+{% endblock content %}

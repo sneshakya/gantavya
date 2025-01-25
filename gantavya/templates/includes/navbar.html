@@ -1,27 +1,35 @@
+{% load static %}
+
 <div class="flex w-full justify-between px-8 py-8 sm:px-16">
 	<a href="/"
-		class="flex-none"
+		class="flex-none text-2xl font-bold hover:opacity-80 transition"
 	>
 		Logo
 	</a>
 	<div class="flex items-center gap-8">
-		<div class="text-xl hover:underline">
-			<a href="">Home</a>
+		<div class="font-medium hover:underline">
+			<a href="/"
+				class="transition hover:text-lime-400"
+			>Home</a>
 		</div>
-		<div class="text-xl hover:underline">
-			<a href="">Explore</a>
+		<div class="font-medium hover:underline">
+			<a href="#"
+				class="transition hover:text-lime-400"
+			>Explore</a>
 		</div>
-		<div class="text-xl hover:underline">
-			<a href="">About</a>
+		<div class="font-medium hover:underline">
+			<a href="#"
+				class="transition hover:text-lime-400"
+			>About</a>
 		</div>
 		{% if user.is_authenticated %}
 
 		<div class="relative">
 			<button onclick="toggle_dropdown()"
-				class="bg-lime-400 flex gap-4 items-center border rounded-full p-4 transition hover:bg-lime-300 active:bg-lime-400"
+				class="bg-lime-400 flex gap-4 items-center border rounded-full px-4 py-2 transition hover:bg-lime-300 active:bg-lime-400 focus:ring focus:ring-lime-200"
 			>
-				<img src="#"
-					class=""
+				<img src="{% static 'images/user/default-avatar.png' %}"
+					class="w-8 h-8 rounded-full"
 					alt="{{ user.username }}"
 				>
 				<i class="fa-solid fa-caret-down"></i>
@@ -29,30 +37,30 @@
 			<!-- Dropdown Menu -->
 			<div id="profile-dropdown"
 				class="hidden absolute right-0 mt-3 w-48 bg-white border
-								rounded-lg shadow-md"
+								rounded-lg shadow-lg z-10"
 			>
 				<ul class="py-2 text-gray-700">
 					<li>
-						<a href="#"
-							class="block px-4 py-2 transition hover:bg-lime-400"
+						<a href="{% url 'profile' %}"
+							class="block px-4 py-2 transition hover:bg-lime-400 hover:text-white"
 						>
 							Profile
 						</a>
 					</li>
 					<li>
 						<a href="#"
-							class="block px-4 py-2 transition hover:bg-lime-400"
+							class="block px-4 py-2 transition hover:bg-lime-400 hover:text-white"
 						>
 							Settings
 						</a>
 					</li>
 
 					<li>
-						<hr class="my-1">
+						<hr class="my-1 border-gray-300">
 					</li>
 					<li>
 						<a href="{% url 'logout' %}"
-							class="block px-4 py-2 transition hover:bg-lime-400"
+							class="block px-4 py-2 transition hover:bg-lime-400 hover:text-white"
 						>
 							Logout
 						</a>
@@ -65,13 +73,13 @@
 		<div>
 			<div class="flex justify-end gap-4">
 				<a href="{% url 'login' %}">
-					<button class="btn-primary">
+					<button class="btn-primary px-4 py-2 transition hover:opacity-90">
 						Login
 					</button>
 				</a>
 
 				<a href="{% url 'register' %}">
-					<button class="btn-primary">
+					<button class="btn-primary px-4 py-2 transition hover:opacity-90">
 						Register
 					</button>
 				</a>
@@ -87,9 +95,9 @@
 	var toggle_dropdown = () => {
 		let dropdown = document.getElementById("profile-dropdown");
 		dropdown.classList.toggle("hidden");
-    };
+	};
 
-	document.addEventListener("click", function (event) {
+	document.addEventListener("click", (event) => {
 		let dropdown = document.getElementById("profile-dropdown");
 		let button = document.querySelector("button[onclick='toggle_dropdown()']");
 

@@ -25,7 +25,6 @@ def create_destinations( num_destination: int = 10 ):
 		Destination.objects.create(
 			name=fake.city(),
 			description=fake.text( max_nb_chars=200 ),
-			image=f"images/{fake.word()}.jpg",  # Simulate image file name
 			longitude=fake.longitude(),
 			latitude=fake.latitude(),
 			city=fake.city(),
@@ -44,7 +43,6 @@ def create_trips( num_trips: int = 20 ):
 			title=fake.sentence(),
 			destination=destination,
 			description=fake.text( max_nb_chars=300 ),
-			image=f"images/{fake.word()}.jpg",  # Simulate image file name
 			price=Decimal( randint( 1000, 10000 ) )
 			# Price between 1000 and 10000
 		)

@@ -16,8 +16,10 @@ Including another URLconf
 """
 from allauth.socialaccount.providers.google.views import oauth2_login, \
 	oauth2_callback
+from django.conf.urls.static import static
 from django.urls import path
 
+from gantavya import settings
 from . import views
 
 
@@ -31,3 +33,7 @@ urlpatterns = [
 	path( 'register/', views.register_user, name="register" ),
 	path( 'logout/', views.logout_user, name="logout" ),
 ]
+
+urlpatterns += static( settings.MEDIA_URL,
+                       document_root=settings.MEDIA_ROOT
+                       )

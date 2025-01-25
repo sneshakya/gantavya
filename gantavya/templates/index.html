@@ -3,10 +3,110 @@
 {% block inner_content %}
 
 <div
-	class="mx-8 sm:mx-28 my-8 h-screen bg-[url('/staticfiles/img/trip1.jpg')]
-				bg-scroll bg-center bg-cover bg-no-repeat"
+	class="mx-8 sm:mx-48 my-8 min-h-[500px]  bg-[url('/staticfiles/img/trip1.jpg')]
+				bg-fixed bg-center bg-cover bg-no-repeat rounded-lg shadow-lg"
 >
-	<div class="h-full bg-slate-900/50">
+	<div class="min-h-[500px] bg-slate-900/50 flex items-center justify-center">
+		<h1 class="text-white text-4xl font-bold">Plan Your Adventure</h1>
+	</div>
+</div>
+
+<div class="my-8 mx-8 sm:mx-48">
+	<div class="h-full p-8">
+		<div class="mt-48">
+			<p class="text-4xl font-bold mb-8 text-center">
+				Explore Trips
+			</p>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				{% for trip in trips %}
+				<div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow duration-300 ease-in-out">
+					<img src="{{ trip.image.url }}"
+						alt="{{ trip.title }}"
+						class="w-full h-40 object-cover rounded-t-lg"
+					/>
+					<h3 class="text-xl font-bold mt-2">
+						{{ trip.title }}
+					</h3>
+					<p class="mt-1 text-gray-600">
+						<strong>Destination:</strong> {{ trip.destination }}
+					</p>
+					<p class="mt-2 text-gray-600 line-clamp-3">
+						{{ trip.description }}
+					</p>
+					<p class="mt-2 text-green-600 font-bold text-lg">
+						Price: {{ trip.price }}
+					</p>
+					<div class="mt-4 text-center">
+						<a href="{{ trip.details_url }}"
+							class="py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300"
+						>
+							Find More
+						</a>
+					</div>
+				</div>
+				{% empty %}
+				<p class="text-gray-500 col-span-full text-center">
+					No available destinations are available.
+				</p>
+				{% endfor %}
+			</div>
+			<div class="text-center mt-6">
+				<a href="/trips"
+					class="inline-block py-3 px-6 bg-gray-800 text-white font-semibold rounded hover:bg-gray-900 transition duration-300"
+				>
+					Explore More
+				</a>
+			</div>
+		</div>
+
+		<div class="mt-48">
+			<p class="text-4xl font-bold mb-8 text-center">
+				Explore Destinations
+			</p>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				{% for destination in destinations %}
+				<div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow duration-300 ease-in-out">
+					<img src="{{ destination.image.url }}"
+						alt="{{ destination.name }}"
+						class="w-full h-40 object-cover rounded-t-lg"
+					/>
+					<h3 class="text-xl font-bold mt-2">
+						{{ destination.name }}
+					</h3>
+					<p class="mt-2 text-gray-600">
+						{{ destination.description }}
+					</p>
+					<p class="mt-1 text-blue-600 font-semibold">
+						{{ destination.city }}, {{ destination.location }}
+					</p>
+					<p class="text-sm text-gray-500">
+						Coordinates: {{ destination.longitude }}, {{
+						destination.latitude }}
+					</p>
+					<div class="mt-4 text-center">
+						<a href="{{ destination.details_url }}"
+							class="py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300"
+						>
+							Find More
+						</a>
+					</div>
+				</div>
+				{% empty %}
+				<p class="text-gray-500 col-span-full text-center">
+					No available destinations are available.
+				</p>
+				{% endfor %}
+			</div>
+			<div class="text-center mt-6">
+				<a href="/destinations"
+					class="inline-block py-3 px-6 bg-gray-800 text-white font-semibold rounded hover:bg-gray-900 transition duration-300"
+				>
+					Explore More
+				</a>
+			</div>
+		</div>
 	</div>
 </div>
 

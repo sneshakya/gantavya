@@ -1,8 +1,17 @@
 from django.shortcuts import render
 
+from trips.models import Destination, Trip
+
 
 def index( request ):
-	return render( request, "index.html" )
+	trips = Trip.objects.all()[ :6 ]
+	destination = Destination.objects.all()[ :6 ]
+
+	return render(
+		request,
+		"index.html",
+		{ "trips": trips, "destinations": destination }
+	)
 
 
 def about( request ):
@@ -11,3 +20,7 @@ def about( request ):
 
 def after_federated_signup( request ):
 	return render( request, "pages/after_federate_signup.html" )
+
+
+def profile( request ):
+	return render( request, "pages/profile.html" )
