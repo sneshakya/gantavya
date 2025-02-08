@@ -7,36 +7,55 @@ Destinations
 
 
 {% block inner_content %}
-<div class="mx-8 mb-16 sm:mx-48">
-	<div class="sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8">
-		{% for destination in destinations %}
-		<div class="max-w-md mx-auto bg-white rounded-xl shadow-md
-					overflow-hidden hover:shadow-lg transition"
-		>
-			<img class="h-48 w-full object-cover"
-				src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fgeo.img.pmdstatic.net%2Ffit%2Fhttp.3A.2F.2Fprd2-bone-image.2Es3-website-eu-west-1.2Eamazonaws.2Ecom.2FGEO.2Fvar.2Fgeo.2Fstorage.2Fimages.2Fmedia.2Fimages.2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.2F2483828-1-fre-FR.2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.2Ejpg%2F1280x720%2Fbackground-color%2Fffffff%2Fquality%2F70%2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.jpg&f=1&nofb=1&ipt=3e19d245f7e6760535b731738b9e64ef45b4bf9c3988fed1c8ab986f28914c92&ipo=images"
-				alt=""
-			>
-			<div class="pt-8 px-8 flex flex-col">
-				<div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-					{{ destination.city }}
-				</div>
-				<p
-					class="block mt-1 text-lg leading-tight font-medium text-black"
+<div class="mx-8 sm:mx-16 mb-16 sm:mx-48 flex flex-col gap-4">
+	{% for destination in destinations %}
+	<div class="bg-gray-100 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition flex">
+		<img class="w-32 sm:w-48 object-cover" src="{{ destination.image.url }}" alt="{{ destination.name }}">
+		<div class="flex flex-col justify-between p-4 w-full">
+			<div class="flex items-center justify-between">
+				<h2 class="text-lg font-semibold">{{ destination.name }}</h2>
+				<button 
+					class="favourite-button flex items-center gap-2 bg-white rounded-full p-2 hover:bg-amber-100 transition-all shadow-md"
+					onclick="toggleFavourite(event, {{ destination.id }}, this)"
 				>
-					{{ destination.name }}
-				</p>
-				<p class="mt-2 text-slate-500">
-					{{ destination.description|truncatechars:50 }}
-				</p>
+					<i class="{% if destination.is_favourite %}heart-icon-filled{% else %}heart-icon-empty{% endif %}"></i>
+					<p class="text-sm font-medium">Save</p>
+				</button>
 			</div>
-			<div class="p-8 font-semibold hover:font-bold">
-				<a href="{% url 'destination' id=destination.id %}">Learn
-				                                                    More</a>
+			<p class="mt-4 text-gray-600">{{ destination.description|truncatechars:50 }}</p>
+			<div class="mt-4">
+				<p class="text-sm font-medium">Popular for:</p>
+				<div class="flex gap-2">
+					<span class="bg-gray-300 rounded-full px-2 py-1 text-xs">Adventure</span>
+					<span class="bg-gray-300 rounded-full px-2 py-1 text-xs">Nature</span>
+					<span class="bg-gray-300 rounded-full px-2 py-1 text-xs">Culture</span>
+				</div>
+			</div>
+			<div class="flex justify-end">
+				<a href="{% url 'destination' destination.id %}" class="mt-4 flex items-center justify-end gap-2">
+					<i class="fa-solid fa-arrow-right"></i>
+					<p class="text-sm font-medium">View Details</p>
+				</a>
 			</div>
 		</div>
-		{% endfor %}
 	</div>
+	{% endfor %}
 </div>
 
 {% endblock inner_content %}
+
+{% block javascript %}
+<script>
+	function toggleFavourite(event, id, button) {
+		if (button.children[0].classList.contains('heart-icon-filled')) {
+			button.children[0].classList.remove('heart-icon-filled');
+			button.children[0].classList.add('heart-icon-empty');
+		} else {
+			button.children[0].classList.remove('heart-icon-empty');
+			button.children[0].classList.add('heart-icon-filled');
+		}
+		fetch( `/add-to-favourites/?id=${id}&context=destination` );
+	}
+</script>
+{% endblock javascript %}
+

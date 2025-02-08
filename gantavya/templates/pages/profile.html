@@ -1,54 +1,101 @@
-{% extends "includes/layout.html" %}
-{% load static %}
+{% extends "includes/layout.html" %} 
+{% load static %} 
 
 {% block content %}
-<div class="mx-48">
-	<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-		<!-- Profile Sidebar -->
-		<div class="bg-white rounded-lg shadow p-6">
-			<div class="text-center mb-4">
-				<img src="{% static 'images/user/default-avatar.png' %}"
-					alt="Profile"
-					class="w-24 h-24 rounded-full mx-auto"
-				>
-				<h2 class="text-xl font-bold mt-4">
-					Hi, {{ user.first_name }}
-				</h2>
-			</div>
-			<hr>
-			<ul class="mt-6 space-y-4">
-				<li>
-					<a href="#"
-						class="text-gray-800 hover:text-purple-600"
-					>
-						Overview
-					</a>
-				</li>
-				<li>
-					<a href="#"
-						class="text-gray-800 hover:text-purple-600"
-					>
-						Settings
-					</a>
-				</li>
-				<li>
-					<a href="#"
-						class="text-gray-800 hover:text-purple-600"
-					>
-						Billing
-					</a>
-				</li>
-				<li>
-					<a href="{% url 'logout' %}"
-						class="text-gray-800 hover:text-purple-600"
-					>
-						Logout
-					</a>
-				</li>
-			</ul>
-		</div>
+<div class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Profile Sidebar -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-center mb-4">
+                <img
+                    src="{{ user.profile_picture.url }}"
+                    alt="Profile"
+                    class="w-24 h-24 rounded-full mx-auto border-2 border-amber-400"
+                />
+                <h2 class="text-xl font-bold mt-4 aboreto-regular">
+                    Hi, {{ user.first_name }}
+                </h2>
+				<p class="text-sm text-gray-600 aboreto-regular">
+					{{ user.email }}
+				</p>
+            </div>
+            <hr class="border-amber-200" />
+            <ul class="mt-6 space-y-4">
+                <li>
+                    <a
+                        href="#"
+                        class="flex items-center gap-2 text-gray-800 hover:text-amber-600 transition-colors aboreto-regular"
+                    >
+                        <i class="fa-solid fa-house w-5"></i>
+                        Overview
+                    </a>
+                </li>
+                <li>
+                    <a
+                        href="#"
+                        class="flex items-center gap-2 text-gray-800 hover:text-amber-600 transition-colors aboreto-regular"
+                    >
+                        <i class="fa-solid fa-gear w-5"></i>
+                        Settings
+                    </a>
+                </li>
+                <li>
+                    <a
+                        href="#"
+                        class="flex items-center gap-2 text-gray-800 hover:text-amber-600 transition-colors aboreto-regular"
+                    >
+                        <i class="fa-solid fa-credit-card w-5"></i>
+                        Billing
+                    </a>
+                </li>
+                <li>
+                    <a
+                        href="{% url 'logout' %}"
+                        class="flex items-center gap-2 text-gray-800 hover:text-amber-600 transition-colors aboreto-regular"
+                    >
+                        <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
 
-	</div>
+        <!-- User Details Form -->
+        <div class="bg-white rounded-lg shadow p-6 lg:col-span-3">
+            <h2 class="text-2xl font-bold mb-6 aboreto-regular">
+                Edit Profile
+            </h2>
+            <form class="space-y-6" method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for field in form %}
+                    <div class="space-y-2">
+                        <label
+                            class="block text-sm font-medium text-gray-700 aboreto-regular"
+                        >
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-red-600 text-sm aboreto-regular">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-8">
+                    <button
+                        type="submit"
+                        class="btn-primary aboreto-regular transition-all"
+                    >
+                        <i class="fa-solid fa-pen-to-square mr-2"></i>
+                        Update Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 {% endblock content %}

@@ -1,0 +1,169 @@
+{% extends "_base.html" %}
+
+{% block title %}
+Register
+{% endblock title %}
+
+
+{% block main %}
+
+<div class="flex flex-col items-center justify-center px-6 py-12 h-screen">
+	<div class="px-24 py-12 border rounded-md">
+		<div class="">
+			<h1 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 aboreto-bold">
+				Signup
+			</h1>
+		</div>
+
+		<div class="mt-10 mx-auto max-w">
+			<form class="space-y-4"
+				method="POST"
+			>
+				{% csrf_token %}
+
+				<div class="flex gap-4">
+					<div class="w-full">
+						<label for="fname"
+							class="block text-sm font-medium leading-6 text-gray-900 aboreto-regular"
+						>First Name</label>
+						<div class="mt-2">
+							{{ form.first_name }}
+							<div class="text-red-700 aboreto-regular">
+								{{ form.first_name.errors }}
+							</div>
+						</div>
+					</div>
+
+					<div class="w-full">
+						<label for="lname"
+							class="block text-sm font-medium leading-6 text-gray-900 aboreto-regular"
+						>Last Name</label>
+						<div class="mt-2">
+							{{ form.last_name }}
+							<div class="text-red-700 aboreto-regular">
+								{{ form.last_name.errors }}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex gap-4">
+					<div>
+						<div class="flex items-center justify-between">
+							<label for="username"
+								class="block text-sm font-medium leading-6 text-gray-900 aboreto-regular"
+							>
+								Username
+							</label>
+						</div>
+						<div class="mt-2">
+							{{ form.username }}
+							<div class="text-red-700 aboreto-regular">
+								{{ form.username.errors }}
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<div class="flex items-center justify-between">
+							<label for="Email"
+								class="block text-sm font-medium leading-6 text-gray-900 aboreto-regular"
+							>
+								Email
+							</label>
+						</div>
+						<div class="mt-2">
+							{{ form.email }}
+							<div class="text-red-700 aboreto-regular">
+								{{ form.email.errors }}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<div class="flex items-center justify-between">
+						<label for="pnumber"
+							class="block text-sm font-medium leading-6 text-gray-900 aboreto-regular"
+						>
+							Phone Number
+						</label>
+					</div>
+					<div class="mt-2">
+						{{ form.phone_number }}
+						<div class="text-red-700 aboreto-regular">
+							{{ form.phone_number.errors }}
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<div class="flex items-center justify-between">
+						<label for="password"
+							class="block text-sm font-medium leading-6 text-gray-900 aboreto-regular"
+						>
+							Password
+						</label>
+					</div>
+					<div class="mt-2">
+						{{ form.password1 }}
+						<div class="text-red-700 aboreto-regular">
+							{{ form.password1.errors }}
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<div class="flex items-center justify-between">
+						<label for="password2"
+							class="block text-sm font-medium leading-6 text-gray-900 aboreto-regular"
+						>
+							Confirm Password
+						</label>
+					</div>
+					<div class="mt-2">
+						{{ form.password2 }}
+						<div class="text-red-700 aboreto-regular">
+							{{ form.password2.errors }}
+						</div>
+					</div>
+				</div>
+
+				<div class="flex flex-col text-center">
+					<button type="submit"
+						class="btn-primary mb-2 aboreto-regular transition-all"
+					>
+						Register
+					</button>
+					<span class="text-center mb-2 max-w-md flex-0 aboreto-regular">Or</span>
+					{% load socialaccount %}
+					<button class="btn-primary aboreto-regular transition-all"
+						onclick="window.location.href = '{% provider_login_url 'google' %}' "
+						type="button"
+					>
+						<div>
+							<i class="fa-brands fa-google"></i>
+							<b>Sign up with Google</b>
+						</div>
+					</button>
+				</div>
+			</form>
+
+			<p class="mt-10 text-center text-sm text-gray-500 aboreto-regular">
+				Have an Account?
+				<a href="{% url 'login' %}"
+					class="font-semibold leading-6 text-amber-600 hover:text-amber-400 aboreto-regular transition-all"
+				>
+					Login
+				</a>
+			</p>
+			<a href="/"
+				class="mt-2 text-sm block text-center font-semibold leading-6 text-amber-600 hover:text-amber-400 aboreto-regular transition-all"
+			>
+				Back to homepage
+			</a>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

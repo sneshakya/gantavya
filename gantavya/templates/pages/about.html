@@ -1,28 +1,73 @@
-{% extends "includes/layout.html" %}
+{% extends "includes/layout.html" %} {% load static %} {% block title %} About
+{% endblock %} {% block content %}
+<div class="aboreto-regular">
+    <div
+        class="my-8 min-h-[500px] bg-[url('/staticfiles/assets/images/about1.png')] bg-fixed bg-center bg-cover bg-no-repeat rounded-lg shadow-lg"
+    >
+        <div
+            class="min-h-[500px] bg-slate-900/50 flex items-center justify-start"
+        >
+            <h1 class="px-48 text-white text-4xl font-bold">About Gantavya</h1>
+        </div>
+    </div>
 
-{% load static %}
+    <div class="mx-8 sm:mx-16 mb-16 sm:mx-48 sm:flex gap-4">
+        <div class="flex flex-col gap-16">
+            <div class="flex flex-col gap-4">
+                <h2 class="text-4xl font-bold">Welcome to Gantavya!</h2>
+                <p>
+                    Gantavya aims to provide a seamless and efficient platform
+                    for users to explore, plan, and book their trips with ease.
+                    Whether it's a business trip or a vacation, our goal is to
+                    ensure a hassle-free experience tailored to your
+                    preferences.
+                </p>
+            </div>
 
-{% block title %}
-About
-{% endblock %}
+            <div class="flex flex-col gap-4">
+                <h2 class="text-4xl font-bold">Our Mission</h2>
+                <p>
+                    Our mission is to make travel planning a breeze for
+                    everyone. We strive to offer comprehensive travel
+                    information, personalized recommendations, and secure
+                    booking solutions.
+                </p>
+            </div>
 
-{% block content %}
-<div class="h-screen">
-	<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-		<h1 class="text-3xl font-bold text-gray-900 mb-4">
-			About Gantavya
-		</h1>
-		<p class="text-lg text-gray-700 mb-4">
-			Welcome to Gantavya,
-			<br>
-			Gantavya aims to provide a seamless and efficient platform for
-			users to explore, plan, and book their trips with ease. Whether it's
-			a business trip or a vacation, our goal is to ensure a hassle-free
-			experience tailored to your preferences.
-		</p>
-		<p class="text-lg text-gray-700">
-			Contact us for more information.
-		</p>
-	</div>
+            <div class="flex flex-col gap-4">
+                <h2 class="text-4xl font-bold">Contact Us</h2>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-phone"></i>
+                    <p>
+                        Contact us for more information at
+                        <span class="font-bold"
+                            >+977 9841748596, +977 01-5411258</span
+                        >
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <p>
+                        Visit us at
+                        <span class="font-bold">Bhaktapur, Nepal</span>
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-envelope"></i>
+                    <p>
+                        Email us at
+                        <span class="font-bold">gantavya@gmail.com</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="my-8">
+            <img
+                src="{% static 'assets/images/about2.png' %}"
+                class="w-full h-full object-cover rounded-lg shadow-lg"
+            />
+        </div>
+    </div>
 </div>
+
 {% endblock content %}

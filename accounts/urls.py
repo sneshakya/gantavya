@@ -14,8 +14,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'), )
 """
-from allauth.socialaccount.providers.google.views import oauth2_login, \
-	oauth2_callback
+
+from allauth.socialaccount.providers.google.views import oauth2_login, oauth2_callback
 from django.conf.urls.static import static
 from django.urls import path
 
@@ -24,16 +24,13 @@ from . import views
 
 
 urlpatterns = [
-	path( 'accounts/google/login/', oauth2_login, name='google_login' ),
-	path( 'accounts/google/login/callback/', oauth2_callback,
-	      name='google_callback'
-	      ),
+    path("accounts/google/login/", oauth2_login, name="google_login"),
+    path("accounts/google/login/callback/", oauth2_callback, name="google_callback"),
+    
+    path("login/", views.login_view, name="login"),
+    path("register/", views.register_user, name="register"),
+    path("logout/", views.logout_user, name="logout"),
+    path("profile/", views.profile_view, name="profile"),
 
-	path( 'login/', views.login_view, name="login" ),
-	path( 'register/', views.register_user, name="register" ),
-	path( 'logout/', views.logout_user, name="logout" ),
+    path('accounts/social/signup/', views.CustomSocialAccountSignupView.as_view(), name='socialaccount_signup'),
 ]
-
-urlpatterns += static( settings.MEDIA_URL,
-                       document_root=settings.MEDIA_ROOT
-                       )

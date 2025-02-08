@@ -1,0 +1,54 @@
+{% extends "includes/layout/homepage.html" %}
+
+
+{% block title %}
+Destinations
+{% endblock title %}
+
+
+{% block inner_content %}
+<div class="mx-8 sm:mx-16 mb-16 sm:mx-48 flex flex-col gap-4">
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+		{% for hotel in hotels %}
+		<div class="bg-gray-100 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col">
+			<img 
+				class="w-full object-cover h-48"
+				src="{{ hotel.image.url }}" 
+				alt="{{ hotel.name }}"
+			>
+			<div class="flex justify-between">
+				<div class="flex flex-col justify-between w-full p-4">
+					<h2 class="text-lg font-semibold">{{ hotel.name }}</h2>
+					<p class="text-gray-600">{{ hotel.location }}</p>
+				</div>
+				<div class="flex items-center justify-center p-4">
+					<button 
+						class="favourite-button flex items-center gap-2 bg-white rounded-full p-2 hover:bg-amber-100 transition-all shadow-md"
+						onclick="toggleFavourite(event, {{ hotel.id }}, this)"
+					>
+						<i class="{% if hotel.is_favourite %}heart-icon-filled{% else %}heart-icon-empty{% endif %}"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+
+{% endblock inner_content %}
+
+{% block javascript %}
+<script>
+	function toggleFavourite(event, id, button) {
+		if (button.children[0].classList.contains('heart-icon-filled')) {
+			button.children[0].classList.remove('heart-icon-filled');
+			button.children[0].classList.add('heart-icon-empty');
+		} else {
+			button.children[0].classList.remove('heart-icon-empty');
+			button.children[0].classList.add('heart-icon-filled');
+		}
+		fetch( `/add-to-favourites/?id=${id}&context=hotel` );
+	}	
+</script>
+{% endblock javascript %}
+

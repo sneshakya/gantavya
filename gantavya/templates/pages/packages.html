@@ -1,0 +1,67 @@
+{% extends "includes/layout/homepage.html" %}
+
+
+{% block title %}
+Destinations
+{% endblock title %}
+
+
+{% block inner_content %}
+<div class="mx-8 sm:mx-16 mb-16 sm:mx-48 flex flex-col gap-4">
+	{% for package in packages %}
+	<div class="bg-gray-100 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition flex">
+		<img class="w-32 sm:w-48 object-cover" src="{{ package.image.url }}" alt="{{ package.name }}">
+		<div class="flex flex-col justify-between p-4 w-full">
+			<div class="flex gap-8 items-center justify-between">
+				<h2 class="flex-grow text-lg font-semibold">{{ package.name }}</h2>
+				<p class="text-sm font-medium">{{ package.duration }} days</p>
+				<button 
+					class="flex-0 flex items-center gap-2 bg-white rounded-full p-2 hover:bg-amber-100 transition-all shadow-md" 
+					onclick="toggleFavourite(event, {{ package.id }}, this)"
+				>
+					<i class="favourite-icon {% if package.is_favourite %}heart-icon-filled{% else %}heart-icon-empty{% endif %}"></i>
+					<p class="text-sm font-medium">Save</p>
+				</button>
+			</div>
+			<p class="mb-4 text-sm font-medium text-gray-600">{{ package.location }}</p>
+			<p class="text-gray-600">{{ package.description|truncatechars:50 }}</p>
+			<div class="mt-4">
+				<p class="text-sm font-medium">Facilities Includes</p>
+				<div class="flex gap-2">
+					<span class="bg-gray-300 rounded-full px-2 py-1 text-xs">Adventure</span>
+					<span class="bg-gray-300 rounded-full px-2 py-1 text-xs">Nature</span>
+					<span class="bg-gray-300 rounded-full px-2 py-1 text-xs">Culture</span>
+				</div>
+			</div>
+			<div class="flex justify-between">
+				<div class="mt-4 flex gap-2">
+					<p class="text-sm font-medium">Price</p>
+					<p class="text-sm font-medium">Rs. {{ package.price }} <span class="text-sm font-medium">per person</span></p>
+				</div>
+				<button class="mt-4 flex items-center justify-end gap-2">
+					<i class="fa-solid fa-arrow-right"></i>
+					<p class="text-sm font-medium">View Details</p>
+				</button>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+</div>
+
+{% endblock inner_content %}
+
+{% block javascript %}
+<script>
+	function toggleFavourite(event, id, button) {
+		if (button.children[0].classList.contains('heart-icon-filled')) {
+			button.children[0].classList.remove('heart-icon-filled');
+			button.children[0].classList.add('heart-icon-empty');
+		} else {
+			button.children[0].classList.remove('heart-icon-empty');
+			button.children[0].classList.add('heart-icon-filled');
+		}
+		fetch( `/add-to-favourites/?id=${id}&context=package` );
+	}
+</script>
+{% endblock javascript %}
+
