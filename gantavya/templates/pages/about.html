@@ -1,73 +1,88 @@
-{% extends "includes/layout.html" %} {% load static %} {% block title %} About
-{% endblock %} {% block content %}
+{% extends "includes/layout.html" %}
+{% load static %}
+
+{% block title %}
+About
+{% endblock title %}
+
+{% block content %}
 <div class="aboreto-regular">
-    <div
-        class="my-8 min-h-[500px] bg-[url('/staticfiles/assets/images/about1.png')] bg-fixed bg-center bg-cover bg-no-repeat rounded-lg shadow-lg"
-    >
-        <div
-            class="min-h-[500px] bg-slate-900/50 flex items-center justify-start"
-        >
-            <h1 class="px-48 text-white text-4xl font-bold">About Gantavya</h1>
+    <div class="relative my-8 min-h-[500px] bg-[url('/staticfiles/assets/images/about1.png')] bg-fixed bg-center bg-cover bg-no-repeat shadow-xl overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/70 to-slate-900/30 flex items-center">
+            <div class="px-8 md:px-16 lg:px-48">
+                <h1 class="text-white text-4xl md:text-5xl font-bold leading-tight">About Gantavya</h1>
+                <p class="text-white/80 mt-4 max-w-2xl text-lg">Your trusted companion for seamless travel experiences in Nepal</p>
+            </div>
         </div>
     </div>
 
-    <div class="mx-8 sm:mx-16 mb-16 sm:mx-48 sm:flex gap-4">
-        <div class="flex flex-col gap-16">
-            <div class="flex flex-col gap-4">
-                <h2 class="text-4xl font-bold">Welcome to Gantavya!</h2>
-                <p>
-                    Gantavya aims to provide a seamless and efficient platform
-                    for users to explore, plan, and book their trips with ease.
-                    Whether it's a business trip or a vacation, our goal is to
-                    ensure a hassle-free experience tailored to your
-                    preferences.
-                </p>
-            </div>
+    <div class="container mx-auto px-8 mb-16">
+        <div class="grid lg:grid-cols-5 gap-12">
+            <div class="lg:col-span-3 space-y-16">
+                <div class="transform hover:scale-105 transition-transform duration-300 bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Welcome to Gantavya!</h2>
+                    <p class="text-gray-600 leading-relaxed">
+                        Gantavya aims to provide a seamless and efficient platform for users to explore, plan, and book their trips with ease.
+                        Whether it's a business trip or a vacation, our goal is to ensure a hassle-free experience tailored to your preferences.
+                    </p>
+                </div>
 
-            <div class="flex flex-col gap-4">
-                <h2 class="text-4xl font-bold">Our Mission</h2>
-                <p>
-                    Our mission is to make travel planning a breeze for
-                    everyone. We strive to offer comprehensive travel
-                    information, personalized recommendations, and secure
-                    booking solutions.
-                </p>
-            </div>
+                <div class="transform hover:scale-105 transition-transform duration-300 bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Our Mission</h2>
+                    <p class="text-gray-600 leading-relaxed">
+                        Our mission is to make travel planning a breeze for everyone. We strive to offer comprehensive travel information,
+                        personalized recommendations, and secure booking solutions.
+                    </p>
+                </div>
 
-            <div class="flex flex-col gap-4">
-                <h2 class="text-4xl font-bold">Contact Us</h2>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-phone"></i>
-                    <p>
-                        Contact us for more information at
-                        <span class="font-bold"
-                            >+977 9841748596, +977 01-5411258</span
-                        >
-                    </p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <p>
-                        Visit us at
-                        <span class="font-bold">Bhaktapur, Nepal</span>
-                    </p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-envelope"></i>
-                    <p>
-                        Email us at
-                        <span class="font-bold">gantavya@gmail.com</span>
-                    </p>
+                <div class="transform hover:scale-105 transition-transform duration-300 bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Contact Us</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="bg-amber-100 p-3 rounded-full">
+                                <i class="fa-solid fa-phone text-amber-600"></i>
+                            </div>
+                            <p class="text-gray-600">
+                                Contact us at
+                                <span class="font-bold text-gray-800 block">+977 9876543210, +977 01-23456</span>
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="bg-amber-100 p-3 rounded-full">
+                                <i class="fa-solid fa-location-dot text-amber-600"></i>
+                            </div>
+                            <p class="text-gray-600">
+                                Visit us at
+                                <span class="font-bold text-gray-800 block">Kathmandu, Nepal</span>
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="bg-amber-100 p-3 rounded-full">
+                                <i class="fa-solid fa-envelope text-amber-600"></i>
+                            </div>
+                            <p class="text-gray-600">
+                                Email us at
+                                <span class="font-bold text-gray-800 block">gantavya@gmail.com</span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="my-8">
-            <img
-                src="{% static 'assets/images/about2.png' %}"
-                class="w-full h-full object-cover rounded-lg shadow-lg"
-            />
+            
+            <div class="lg:col-span-2">
+                <div class="sticky top-8">
+                    <img
+                        src="{% static 'assets/images/about2.png' %}"
+                        class="w-full h-auto object-cover rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300"
+                        alt="About Gantavya"
+                        height="600"
+                        width="1200"
+                    />
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
 {% endblock content %}

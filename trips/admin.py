@@ -59,8 +59,8 @@ class HotelReviewAdmin(admin.ModelAdmin):
 	empty_value_display = "-empty-"
 
 
-@admin.register(models.Activities)
-class ActivitiesAdmin(admin.ModelAdmin):
+@admin.register(models.Activity)
+class ActivityAdmin(admin.ModelAdmin):
 	empty_value_display = "-empty-"
 
 

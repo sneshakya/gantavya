@@ -1,50 +1,56 @@
 {% extends "includes/layout/homepage.html" %}
-
-
 {% block title %}
-Destinations
+    Activities
 {% endblock title %}
-
-
 {% block inner_content %}
-<div class="mx-8 sm:mx-16 mb-16 sm:mx-48 flex flex-col gap-4">
-	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-		{% for activity in activities %}
-		<div class="bg-gray-100 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col">
-			<img class="w-full object-cover h-48" src="{{ activity.image.url }}" alt="{{ activity.name }}">
-			<div class="flex">
-				<div class="flex flex-col justify-between w-full p-4">
-					<h2 class="text-lg font-semibold">{{ activity.name }}</h2>
-					<p class="text-gray-600">{{ activity.location }}</p>
-				</div>
-				<div class="flex items-center justify-center p-4">
-					<button 
-						class="favourite-button flex items-center gap-2 bg-white rounded-full p-2 hover:bg-amber-100 transition-all shadow-md"
-						onclick="toggleFavourite(event, {{ activity.id }}, this)"
-					>
-						<i class="{% if activity.is_favourite %}heart-icon-filled{% else %}heart-icon-empty{% endif %}"></i>
-					</button>
-				</div>
-			</div>
-		</div>
-		{% endfor %}
-	</div>
-</div>
-
+    <div class="mx-4 sm:mx-8 lg:mx-16 xl:mx-32 mb-16">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Explore Activities</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for activity in activities %}
+                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="relative">
+                        <img class="w-full object-cover h-56"
+                             src="{{ activity.image.url }}"
+                             alt="{{ activity.name }}">
+                        <button class="favourite-button absolute top-4 right-4 flex items-center justify-center w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full hover:bg-amber-100 transition-all duration-300 shadow-lg"
+                                onclick="toggleFavourite(event, {{ activity.id }}, this)">
+                            <i class="{% if activity.is_favourite %}heart-icon-filled text-red-500{% else %}heart-icon-empty text-gray-600{% endif %}"></i>
+                        </button>
+                    </div>
+                    <div class="p-5">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ activity.name }}</h2>
+                        <div class="flex items-center text-gray-600 mb-3">
+                            <svg class="w-5 h-5 mr-2"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>{{ activity.location }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock inner_content %}
-
 {% block javascript %}
-<script>
-	function toggleFavourite(event, id, button) {
-		if (button.children[0].classList.contains('heart-icon-filled')) {
-			button.children[0].classList.remove('heart-icon-filled');
-			button.children[0].classList.add('heart-icon-empty');
-		} else {
-			button.children[0].classList.remove('heart-icon-empty');
-			button.children[0].classList.add('heart-icon-filled');
-		}
-		fetch( `/add-to-favourites/?id=${id}&context=activity` );
-	}	
-</script>
+    <script>
+    function toggleFavourite(event, id, button) {
+        event.preventDefault();
+        const icon = button.children[0];
+        
+        if (icon.classList.contains('heart-icon-filled')) {
+            icon.classList.remove('heart-icon-filled', 'text-red-500');
+            icon.classList.add('heart-icon-empty', 'text-gray-600');
+        } else {
+            icon.classList.remove('heart-icon-empty', 'text-gray-600');
+            icon.classList.add('heart-icon-filled', 'text-red-500');
+        }
+        
+        fetch(`/add-to-favourites/?id=${id}&context=activity`)
+            .catch(error => console.error('Error:', error));
+    }
+    </script>
 {% endblock javascript %}
-

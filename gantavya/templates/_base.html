@@ -38,21 +38,20 @@
 		type="text/css"
 	>
 
-
 	<title>
 		{% block title %}
 
 		{% endblock %}
 	</title>
+</head>
 
 <body class="flex flex-col justify-between min-h-screen">
-{% block main %}
+	{% block main %}
 
 {% endblock main %}
 </body>
 
 {% block javascript %}
 {% endblock javascript %}
-
 
 </html>

@@ -2,43 +2,84 @@
 
 
 {% block title %}
-Destination
+{{ hotel.name }} - Hotel
 {% endblock title %}
 
 
 {% block inner_content %}
-<div class="mx-8 mb-16 sm:mx-48 lg:mx-48">
-	<img class="h-48 w-full object-cover"
-		src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fgeo.img.pmdstatic.net%2Ffit%2Fhttp.3A.2F.2Fprd2-bone-image.2Es3-website-eu-west-1.2Eamazonaws.2Ecom.2FGEO.2Fvar.2Fgeo.2Fstorage.2Fimages.2Fmedia.2Fimages.2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.2F2483828-1-fre-FR.2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.2Ejpg%2F1280x720%2Fbackground-color%2Fffffff%2Fquality%2F70%2Fphotos-le-top-10-des-destinations-ou-partir-en-octobre.jpg&f=1&nofb=1&ipt=3e19d245f7e6760535b731738b9e64ef45b4bf9c3988fed1c8ab986f28914c92&ipo=images"
-		alt=""
-	>
+<div class="mx-4 sm:mx-8 lg:mx-16 xl:mx-32 mb-16">
+    <div class="relative">
+        <img class="h-[400px] w-full object-cover rounded-xl shadow-lg" 
+            src="{{ hotel.image.url }}"
+            alt="{{ hotel.name }}"
+        >
+        <button 
+            class="favourite-button absolute top-6 right-6 flex items-center justify-center w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full hover:bg-amber-100 transition-all duration-300 shadow-lg"
+            onclick="toggleFavourite(event, {{ hotel.id }}, this)"
+        >
+            <i class="{% if is_favourite %}heart-icon-filled text-red-500{% else %}heart-icon-empty text-gray-600{% endif %}"></i>
+        </button>
+    </div>
 
-	<div class="pt-8 px-8 flex flex-col">
-		<div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-			{{ destination.city }}
-		</div>
-		<p class="block mt-1 text-lg leading-tight font-medium text-black"
-		>
-			{{ destination.name }}
-		</p>
-		<p class="block mt-1 text-lg leading-tight font-medium text-slate-700"
-		>
-			{{ destination.location }}
-		</p>
-		<p class="block mt-1 text-sm leading-tight text-slate-600"
-		>
-			{{ destination.longitude }}, {{ destination.latitude }}
-		</p>
-		<p class="mt-2 text-slate-500">
-			{{ destination.description }}
-		</p>
-	</div>
+    <div class="mt-8 bg-white rounded-xl shadow-md p-8">
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-indigo-500 font-semibold">{{ hotel.city }}</span>
+            </div>
+            
+            <h1 class="text-3xl font-bold text-gray-800">{{ hotel.name }}</h1>
+            
+            <div class="flex items-center text-gray-600">
+                <span class="font-medium">{{ hotel.location }}</span>
+            </div>
+            
+            <div class="flex items-center text-gray-500 text-sm">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                </svg>
+                <span>{{ hotel.longitude }}, {{ hotel.latitude }}</span>
+            </div>
+            
+            <p class="mt-4 text-gray-600 leading-relaxed">
+                {{ hotel.description }}
+            </p>
+        </div>
+    </div>
 
-	<div class="my-8 text-center">
-		<a class="btn-primary"
-			href="{% url 'destination' %}"
-		>Back To Destination</a>
-	</div>
+    <div class="mt-8 text-center">
+        <a class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+            href="{% url 'hotels' %}"
+        >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Hotels
+        </a>
+    </div>
 </div>
 
 {% endblock inner_content %}
+
+{% block javascript %}
+<script>
+    function toggleFavourite(event, id, button) {
+        event.preventDefault();
+        const icon = button.children[0];
+        
+        if (icon.classList.contains('heart-icon-filled')) {
+            icon.classList.remove('heart-icon-filled', 'text-red-500');
+            icon.classList.add('heart-icon-empty', 'text-gray-600');
+        } else {
+            icon.classList.remove('heart-icon-empty', 'text-gray-600');
+            icon.classList.add('heart-icon-filled', 'text-red-500');
+        }
+        
+        fetch(`/add-to-favourites/?id=${id}&context=hotel`)
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock javascript %}

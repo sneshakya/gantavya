@@ -1,209 +1,250 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.db.models import Model
+from typing import Type, Optional, Tuple
 
 from .models import (
-    Destination,
-    Trip,
-    Activities,
-    Package,
-    Hotel,
-    FavouriteDestination,
-    FavouriteTrip,
-    FavouriteActivity,
-    FavouritePackage,
-    FavouriteHotel,
+	ActivityBooking,
+	Destination,
+	HotelBooking,
+	PackageBooking,
+	Trip,
+	Activity,
+	Package,
+	Hotel,
+	FavouriteDestination,
+	FavouriteTrip,
+	FavouriteActivity,
+	FavouritePackage,
+	FavouriteHotel,
+	TripBooking,
 )
 
 
-# Create your views here.
+def get_objects_with_favorites(model, favorite_model, user, template_name):
+	"""Helper function to get objects with favorite status for authenticated users."""
+
+	objects = model.objects.all()
+	if not user.is_authenticated:
+		return {template_name: objects}
+
+	favorites = favorite_model.objects.filter(user=user).values_list(
+		f"{model.__name__.lower()}_id", flat=True
+	)
+	objects_with_favorites = [
+		{**obj.__dict__, "is_favourite": obj.id in favorites} for obj in objects
+	]
+	return {template_name: objects_with_favorites}
+
+
+def get_object_details(model, object_id, user, favorite_model):
+	"""Helper function to get object details including favorite status and adjacent IDs."""
+
+	obj = get_object_or_404(model, pk=object_id)
+	is_favorite = (
+		favorite_model.objects.filter(
+			**{model.__name__.lower(): obj}, user=user
+		).exists()
+		if user.is_authenticated
+		else False
+	)
+
+	object_ids = list(model.objects.order_by("id").values_list("id", flat=True))
+	current_index = object_ids.index(object_id)
+	prev_id = object_ids[current_index - 1] if current_index > 0 else None
+	next_id = (
+		object_ids[current_index + 1] if current_index < len(object_ids) - 1 else None
+	)
+
+	return {model.__name__.lower(): obj, "is_favourite": is_favorite}, prev_id, next_id
+
+
 def index(request):
-    trips = {}
-
-    searchParam = request.GET.get("q", "default")
-
-    if searchParam != "default":
-        trips = searchParam
-    else:
-        trips = ""
-
-    return render(request, "pages/explore.html", {"trips": trips})
+	search_query = request.GET.get("q", "")
+	trips = (
+		Trip.objects.filter(name__icontains=search_query)
+		if search_query
+		else Trip.objects.all()
+	)
+	return render(request, "pages/explore.html", {"trips": trips})
 
 
 def destinations(request, id=None):
-    if id is not None:
-        destination = Destination.objects.get(pk=id)
-        is_favourite = FavouriteDestination.objects.filter(
-            destination=destination, user=request.user
-        ).exists()
-        return render(
-            request,
-            "pages/destination.html",
-            {"destination": destination, "is_favourite": is_favourite},
-        )
+	if id:
+		context, prev_id, next_id = get_object_details(
+			Destination, id, request.user, FavouriteDestination
+		)
+		destination = context["destination"]
+		trip = Trip.objects.filter(destination=destination)
+		trip_price = trip.values_list("price", flat=True).first()
+		existing_booking = (
+			TripBooking.objects.filter(user=request.user, trip=trip.first()).first()
+			if request.user.is_authenticated
+			else None
+		)
 
-    destinations = Destination.objects.all()
-    favourites = FavouriteDestination.objects.filter(user=request.user).values_list(
-        "destination_id", flat=True
-    )
-    destinations_with_favourites = [
-        {**destination.__dict__, "is_favourite": destination.id in favourites}
-        for destination in destinations
-    ]
-
-    return render(
-        request,
-        "pages/destinations.html",
-        {"destinations": destinations_with_favourites},
-    )
+		context.update(
+			{
+				"prev_destination_id": prev_id,
+				"next_destination_id": next_id,
+				"trip": trip.first(),
+				"existing_booking": existing_booking,
+			}
+		)
+		return render(request, "pages/destination.html", context)
+	return render(
+		request,
+		"pages/destinations.html",
+		get_objects_with_favorites(
+			Destination, FavouriteDestination, request.user, "destinations"
+		),
+	)
 
 
 def hotels(request, id=None):
-    if id is not None:
-        hotel = Hotel.objects.get(pk=id)
-        is_favourite = FavouriteHotel.objects.filter(
-            hotel=hotel, user=request.user
-        ).exists()
-        return render(
-            request,
-            "pages/hotel.html",
-            {"hotel": hotel, "is_favourite": is_favourite},
-        )
-
-    hotels = Hotel.objects.all()
-    favourites = FavouriteHotel.objects.filter(user=request.user).values_list(
-        "hotel_id", flat=True
-    )
-    hotels_with_favourites = [
-        {**hotel.__dict__, "is_favourite": hotel.id in favourites} for hotel in hotels
-    ]
-
-    return render(
-        request,
-        "pages/hotels.html",
-        {"hotels": hotels_with_favourites},
-    )
+	if id:
+		context, prev_id, next_id = get_object_details(
+			Hotel, id, request.user, FavouriteHotel
+		)
+		context.update({"prev_hotel_id": prev_id, "next_hotel_id": next_id})
+		return render(request, "pages/hotel.html", context)
+	return render(
+		request,
+		"pages/hotels.html",
+		get_objects_with_favorites(Hotel, FavouriteHotel, request.user, "hotels"),
+	)
 
 
 def activities(request, id=None):
-    if id is not None:
-        activity = Activities.objects.get(pk=id)
-        is_favourite = FavouriteActivity.objects.filter(
-            activity=activity, user=request.user
-        ).exists()
-        return render(
-            request,
-            "pages/activity.html",
-            {"activity": activity, "is_favourite": is_favourite},
-        )
+	if id:
+		context, prev_id, next_id = get_object_details(
+			Activity, id, request.user, FavouriteActivity
+		)
+		context.update({"prev_activity_id": prev_id, "next_activity_id": next_id})
+		return render(request, "pages/activity.html", context)
+	return render(
+		request,
+		"pages/activities.html",
+		get_objects_with_favorites(
+			Activity, FavouriteActivity, request.user, "activities"
+		),
+	)
 
-    activities = Activities.objects.all()
-    favourites = FavouriteActivity.objects.filter(user=request.user).values_list(
-        "activity_id", flat=True
-    )
-    activities_with_favourites = [
-        {**activity.__dict__, "is_favourite": activity.id in favourites}
-        for activity in activities
-    ]
-
-    return render(
-        request,
-        "pages/activities.html",
-        {"activities": activities_with_favourites},
-    )
 
 def packages(request, id=None):
-    if id is not None:
-        package = Package.objects.get(pk=id)
-        is_favourite = FavouritePackage.objects.filter(
-            package=package, user=request.user
-        ).exists()
-        return render(
-            request,
-            "pages/package.html",
-            {"package": package, "is_favourite": is_favourite},
-        )
+	if id:
+		context, prev_id, next_id = get_object_details(
+			Package, id, request.user, FavouritePackage
+		)
+		package = Package.objects.get(id=id)
+		existing_booking = (
+			PackageBooking.objects.filter(user=request.user, package=package.id).first()
+			if request.user.is_authenticated
+			else None
+		)
 
-    packages = Package.objects.all()
-    favourites = FavouritePackage.objects.filter(user=request.user).values_list(
-        "package_id", flat=True
-    )
-    packages_with_favourites = [
-        {**package.__dict__, "is_favourite": package.id in favourites}
-        for package in packages
-    ]
+		context.update(
+			{
+				"prev_package_id": prev_id,
+				"next_package_id": next_id,
+				"existing_booking": existing_booking,
+			}
+		)
+		return render(request, "pages/package.html", context)
+	return render(
+		request,
+		"pages/packages.html",
+		get_objects_with_favorites(Package, FavouritePackage, request.user, "packages"),
+	)
 
-    return render(
-        request,
-        "pages/packages.html",
-        {"packages": packages_with_favourites},
-    )
 
-
+@login_required(login_url="/login/")
 def add_to_favourites(request):
-    if not request.user.is_authenticated:
-        return redirect("login")
+	context_map = {
+		"destination": (Destination, FavouriteDestination, "destination"),
+		"trip": (Trip, FavouriteTrip, "trip"),
+		"activity": (Activity, FavouriteActivity, "activity"),
+		"package": (Package, FavouritePackage, "package"),
+		"hotel": (Hotel, FavouriteHotel, "hotel"),
+	}
 
-    id = request.GET.get("id")
-    context = request.GET.get("context")
-    
-    if context == "destination":
-        if FavouriteDestination.objects.filter(
-            destination=Destination.objects.get(pk=id), user=request.user
-        ).exists():
-            FavouriteDestination.objects.filter(
-                destination=Destination.objects.get(pk=id), user=request.user
-            ).delete()
-        else:
-            fav_destination = FavouriteDestination()
-            fav_destination.user = request.user
-            fav_destination.destination = Destination.objects.get(pk=id)
-            fav_destination.save()
-    elif context == "trip":
-        if FavouriteTrip.objects.filter(
-            trip=Trip.objects.get(pk=id), user=request.user
-        ).exists():
-            FavouriteTrip.objects.filter(
-                trip=Trip.objects.get(pk=id), user=request.user
-            ).delete()
-        else:
-            fav_trip = FavouriteTrip()
-            fav_trip.user = request.user
-            fav_trip.trip = Trip.objects.get(pk=id)
-            fav_trip.save()
-    elif context == "activity":
-        if FavouriteActivity.objects.filter(
-            activity=Activities.objects.get(pk=id), user=request.user
-        ).exists():
-            FavouriteActivity.objects.filter(
-                activity=Activities.objects.get(pk=id), user=request.user
-            ).delete()
-        else:
-            fav_activity = FavouriteActivity()
-            fav_activity.user = request.user
-            fav_activity.activity = Activities.objects.get(pk=id)
-            fav_activity.save()
-    elif context == "package":
-        if FavouritePackage.objects.filter(
-            package=Package.objects.get(pk=id), user=request.user
-        ).exists():
-            FavouritePackage.objects.filter(
-                package=Package.objects.get(pk=id), user=request.user
-            ).delete()
-        else:
-            fav_package = FavouritePackage()
-            fav_package.user = request.user
-            fav_package.package = Package.objects.get(pk=id)
-            fav_package.save()
-    elif context == "hotel":
-        if FavouriteHotel.objects.filter(
-            hotel=Hotel.objects.get(pk=id), user=request.user
-        ).exists():
-            FavouriteHotel.objects.filter(
-                hotel=Hotel.objects.get(pk=id), user=request.user
-            ).delete()
-        else:
-            fav_hotel = FavouriteHotel()
-            fav_hotel.user = request.user
-            fav_hotel.hotel = Hotel.objects.get(pk=id)
-            fav_hotel.save()
+	obj_id = request.GET.get("id")
+	context_type = request.GET.get("context")
 
-    return redirect("destination", id=id)
+	if not obj_id or not context_type or context_type not in context_map:
+		return redirect("index")
+
+	model, fav_model, redirect_name = context_map[context_type]
+	obj = get_object_or_404(model, pk=obj_id)
+	fav_relation = fav_model.objects.filter(**{redirect_name: obj}, user=request.user)
+
+	if fav_relation.exists():
+		fav_relation.delete()
+	else:
+		fav_model.objects.create(**{redirect_name: obj}, user=request.user)
+
+	return redirect(redirect_name, id=obj_id)
+
+
+@login_required(login_url="/login/")
+def book_trip(request, id):
+	if TripBooking.objects.filter(user=request.user, trip=id).exists():
+		return redirect("bookings")
+
+	trip = get_object_or_404(Trip, pk=id)
+	trip_booking = TripBooking.objects.create(trip=trip, user=request.user)
+	return redirect("bookings")
+
+
+@login_required(login_url="/login/")
+def book_activity(request, id):
+	if ActivityBooking.objects.filter(user=request.user, activity=id).exists():
+		return redirect("bookings")
+
+	activity = get_object_or_404(Activity, pk=id)
+	activity_booking = ActivityBooking.objects.create(
+		activity=activity, user=request.user
+	)
+	return redirect("bookings")
+
+
+@login_required(login_url="/login/")
+def book_package(request, id):
+	if PackageBooking.objects.filter(user=request.user, package=id).exists():
+		return redirect("bookings")
+
+	package = get_object_or_404(Package, pk=id)
+	package_booking = PackageBooking.objects.create(package=package, user=request.user)
+	return redirect("bookings")
+
+
+@login_required(login_url="/login/")
+def bookings(request):
+	from django.utils import timezone
+	from itertools import chain
+
+	today = timezone.now().date()
+
+	# Get all bookings across different types
+	trip_bookings = TripBooking.objects.filter(user=request.user)
+	activity_bookings = ActivityBooking.objects.filter(user=request.user)
+	package_bookings = PackageBooking.objects.filter(user=request.user)
+	hotel_bookings = HotelBooking.objects.filter(user=request.user)
+
+	# Combine and split into upcoming/past bookings
+	all_bookings = list(
+		chain(trip_bookings, activity_bookings, package_bookings, hotel_bookings)
+	)
+	upcoming_bookings = [b for b in all_bookings if b.created_at >= today]
+	past_bookings = [b for b in all_bookings if b.created_at < today]
+
+	return render(
+		request,
+		"pages/bookings.html",
+		{
+			"upcoming_bookings": sorted(upcoming_bookings, key=lambda x: x.created_at),
+			"past_bookings": sorted(
+				past_bookings, key=lambda x: x.created_at, reverse=True
+			),
+		},
+	)

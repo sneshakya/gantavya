@@ -8,73 +8,79 @@ Homepage
 
 {% block content %}
 
-<div class="max-h-screen overflow-hidden w-full aboreto-regular">
+<div class="max-h-screen overflow-hidden w-full aboreto-regular bg-gradient-to-b from-amber-50 to-white">
 	<div class="w-full py-8 sm:px-16">
-		<div class="mb-8 font-bold text-xl text-center">
-			"YOUR JOURNEY, OUR DESTINATION"
+		<div class="mb-8 font-bold text-3xl text-center text-gray-800 tracking-wide">
+			<span class="text-amber-600">"YOUR JOURNEY,</span> 
+			<span class="text-gray-700">OUR DESTINATION"</span>
 		</div>
 
-		<div class="sm:flex text-center justify-center gap-4 mb-4 font-medium">
+		<nav class="sm:flex text-center justify-center gap-4 mb-8 font-medium">
 			<a
-				href="{% url 'destination' %}"
-				class="py-2 px-4 hover:bg-amber-400 rounded-full transition-all
-						{% if 'destination' in request.path %}bg-amber-400 rounded-full{% endif %}"
+				href="{% url 'destinations' %}"
+				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
+						{% if 'destination' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
+				<i class="fas fa-map-marker-alt"></i>
 				Destinations
 			</a>
 
 			<a
 				href="{% url 'hotels' %}"
-				class="py-2 px-4 hover:bg-amber-400 rounded-full transition-all
-						{% if 'hotels' in request.path %}bg-amber-400 rounded-full{% endif %}"
+				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
+						{% if 'hotels' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
+				<i class="fas fa-hotel"></i>
 				Hotels & Homestays
 			</a>
 
 			<a
 				href="{% url 'activities' %}"
-				class="py-2 px-4 hover:bg-amber-400 rounded-full transition-all
-						{% if 'activities' in request.path %}bg-amber-400 rounded-full{% endif %}"
+				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
+						{% if 'activities' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
+				<i class="fas fa-hiking"></i>
 				Activity
 			</a>
 
 			<a 
 				href="{% url 'packages' %}"
-				class="py-2 px-4 hover:bg-amber-400 rounded-full transition-all
-						{% if 'packages' in request.path %}bg-amber-400 rounded-full{% endif %}"
+				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
+						{% if 'packages' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
+				<i class="fas fa-suitcase"></i>
 				Vacation Packages
 			</a>
 			<a 
 				href="{% url 'about' %}"
-				class="py-2 px-4 hover:bg-amber-400 rounded-full transition-all
-						{% if 'about' in request.path %}bg-amber-400 rounded-full{% endif %}"
+				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
+						{% if 'about' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
+				<i class="fas fa-info-circle"></i>
 				About
 			</a>
-		</div>
+		</nav>
 
-		<div class="flex justify-center gap-8 w-full">
-			<div class="flex gap-4 sm:w-1/2">
-				<input class="w-full border-none rounded-full bg-amber-200"
+		<div class="flex justify-center gap-8 w-full mb-8">
+			<div class="flex gap-4 sm:w-1/2 relative">
+				<input 
+					class="w-full border-2 border-amber-200 rounded-full bg-white px-6 py-3 focus:outline-none focus:border-amber-400 transition-all duration-300 shadow-sm"
 					type="text"
 					id="search-bar"
+					placeholder="Search your next adventure..."
 				>
-				<a class="flex items-center cursor-pointer"
+				<a class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center cursor-pointer"
 					id="search-button"
 					href="{% url 'explore'%}"
 				>
-					<i
-						class="fa-solid fa-magnifying-glass hover:text-amber-700"
-					></i>
+					<i class="fa-solid fa-magnifying-glass text-amber-500 hover:text-amber-700 text-xl transition-colors duration-300"></i>
 				</a>
 			</div>
 		</div>
 	</div>
 
-	<div class="mx-8 overflow-y-auto h-[calc(100vh-200px)] scrollbar-thin scrollbar-thumb-amber-400 scrollbar-track-amber-100 lg:mx-64">
-		<div class="">
+	<div class="mx-8 overflow-y-auto h-[calc(100vh-250px)] scrollbar-thin scrollbar-thumb-amber-400 scrollbar-track-amber-100 lg:mx-64">
+		<div class="pb-8">
 			{% block inner_content %}
 			{% endblock inner_content %}
 		</div>
@@ -83,4 +89,3 @@ Homepage
 </div>
 
 {% endblock content %}
-

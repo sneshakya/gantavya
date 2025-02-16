@@ -1,115 +1,127 @@
 {% load static %}
 
-<div class="aboreto-light flex w-full justify-between px-8 sm:px-16">
-    <a href="/" class="flex-none">
-        <img
-            src="{% static 'logo.png'  %}"
+<nav class="bg-white shadow-md">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-24">
+      <!-- Logo Section -->
+      <div class="flex-shrink-0 flex items-center">
+        <a href="{% url 'home' %}" class="block group">
+          <img 
+            src="{% static 'logo.png' %}" 
             alt="Gantavya Logo"
-            height="128"
+            class="h-12 w-auto transition-all duration-300 hover:scale-105 hover:opacity-90"
             width="128"
-        />
-    </a>
-    <div class="flex items-center gap-8">
-        {% if user.is_authenticated %}
+            height="128"
+          />
+        </a>
+      </div>
 
-        <div class="relative">
-            <div class="flex gap-4 items-center">
-                <a href="#">
-                    <i class="fa-solid fa-bell text-amber-400"></i>
-                </a>
-                <button
-                    onclick="toggle_dropdown()"
-                    class="bg-amber-400 flex gap-4 items-center border rounded-full px-4 py-2 transition hover:bg-amber-300 active:bg-amber-400 focus:ring focus:ring-amber-200"
-                >
-                    <img
-                        src="{{ user.profile_picture.url }}"
-                        class="w-8 h-8 rounded-full"
-                        alt="{{ user.username }}"
-                    />
-                    <i class="fa-solid fa-caret-down"></i>
-                </button>
-            </div>
+      <!-- Navigation Items -->
+      <div class="flex items-center gap-6">
+        {% if user.is_authenticated %}
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button 
+              class="p-2 rounded-full hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all duration-300 hover:scale-105"
+              aria-label="View notifications"
+            >
+              <i class="fa-solid fa-bell text-amber-500 text-xl"></i>
+              <span class="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white animate-ping"></span>
+            </button>
+          </div>
+
+          <!-- Profile Dropdown -->
+          <div class="relative" x-data="{ open: false }">
+            <button
+              @click="open = !open"
+              @keydown.escape.window="open = false"
+              class="flex items-center gap-3 px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all duration-300 group"
+              aria-expanded="false"
+            >
+              <img
+                src="{{ user.profile_picture.url }}"
+                alt="{{ user.username }}'s profile"
+                class="h-8 w-8 rounded-full object-cover border-2 border-white group-hover:border-amber-50 transition-colors"
+                width="32"
+                height="32"
+              />
+              <i class="fa-solid fa-caret-down text-white transition-transform duration-300 group-hover:-rotate-180"></i>
+            </button>
 
             <!-- Dropdown Menu -->
             <div
-                id="profile-dropdown"
-                class="hidden absolute right-0 mt-3 w-48 bg-white border rounded-lg shadow-lg z-10"
+              x-show="open"
+              @click.away="open = false"
+              x-transition:enter="transition ease-out duration-100"
+              x-transition:enter-start="transform opacity-0 scale-95"
+              x-transition:enter-end="transform opacity-100 scale-100"
+              x-transition:leave="transition ease-in duration-75"
+              x-transition:leave-start="transform opacity-100 scale-100"
+              x-transition:leave-end="transform opacity-0 scale-95"
+              class="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-xl ring-1 ring-black/5 focus:outline-none backdrop-blur-sm z-50"
+              role="menu"
+              aria-orientation="vertical"
+              aria-labelledby="user-menu-button"
             >
-                <ul class="py-2 text-gray-700">
-                    <li>
-                        <a
-                            href="{% url 'profile' %}"
-                            class="block px-4 py-2 transition hover:bg-amber-400 hover:text-white"
-                        >
-                            Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="#"
-                            class="block px-4 py-2 transition hover:bg-amber-400 hover:text-white"
-                        >
-                            Settings
-                        </a>
-                    </li>
-
-                    <li>
-                        <hr class="my-1 border-gray-300" />
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'logout' %}"
-                            class="block px-4 py-2 transition hover:bg-amber-400 hover:text-white"
-                        >
-                            Logout
-                        </a>
-                    </li>
-                </ul>
+              <div class="py-2 space-y-1" role="none">
+                <a
+                  href="{% url 'profile' %}"
+                  class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 transition-all duration-200 hover:pl-5"
+                  role="menuitem"
+                >
+                  <i class="fa-solid fa-user mr-3 text-amber-500"></i>
+                  Profile
+                </a>
+                <a
+                  href="#"
+                  class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 transition-all duration-200 hover:pl-5"
+                  role="menuitem"
+                >
+                  <i class="fa-solid fa-gear mr-3 text-amber-500"></i>
+                  Settings
+                </a>
+                <a
+                  href="{% url "bookings" %}"
+                  class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 transition-all duration-200 hover:pl-5"
+                  role="menuitem"
+                >
+                  <i class="fa-solid fa-book mr-3 text-amber-500"></i>
+                  Bookings
+                </a>
+                <div class="border-t border-gray-100 my-1"></div>
+                <a
+                  href="{% url 'logout' %}"
+                  class="group flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-200 hover:pl-5"
+                  role="menuitem"
+                >
+                  <i class="fa-solid fa-right-from-bracket mr-3"></i>
+                  Logout
+                </a>
+              </div>
             </div>
-        </div>
+          </div>
 
         {% else %}
-        <div class="flex justify-end gap-4">
-            <a href="{% url 'register' %}">
-                <button
-                    class="btn-primary px-4 py-2 transition hover:opacity-90"
-                >
-                    SignUp
-                </button>
+          <div class="flex items-center gap-4">
+            <a 
+              href="{% url 'register' %}"
+              class="px-6 py-2.5 text-sm font-medium text-amber-600 hover:text-amber-700 rounded-full border-2 border-amber-400 hover:border-amber-500 transition-all duration-300 hover:shadow-sm"
+            >
+              Sign Up
             </a>
-
-            <a href="{% url 'login' %}">
-                <button
-                    class="btn-primary px-4 py-2 transition hover:opacity-90"
-                >
-                    Login
-                </button>
+            <a 
+              href="{% url 'login' %}"
+              class="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 rounded-full transition-all duration-300 shadow-sm hover:shadow-md"
+            >
+              Login
             </a>
-        </div>
-
+          </div>
         {% endif %}
+      </div>
     </div>
-</div>
+  </div>
+</nav>
 
 {% block javascript %}
-<script>
-    var toggle_dropdown = () => {
-        let dropdown = document.getElementById('profile-dropdown')
-        dropdown.classList.toggle('hidden')
-    }
-
-    document.addEventListener('click', (event) => {
-        let dropdown = document.getElementById('profile-dropdown')
-        let button = document.querySelector(
-            "button[onclick='toggle_dropdown()']"
-        )
-
-        if (
-            !dropdown.contains(event.target) &&
-            !button.contains(event.target)
-        ) {
-            dropdown.classList.add('hidden')
-        }
-    })
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js" defer></script>
 {% endblock javascript %}
