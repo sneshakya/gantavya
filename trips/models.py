@@ -120,6 +120,7 @@ class ActivityImage(models.Model):
 class TripBooking(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    start_date = models.DateField()
     created_at = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -129,22 +130,28 @@ class TripBooking(models.Model):
 class ActivityBooking(models.Model):
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    start_date = models.DateField()
     created_at = models.DateField(auto_now_add=True)
     
     def __str__(self):
         return "activity"
 
+
 class HotelBooking(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    from_date = models.DateField()
+    to_date = models.DateField()
     created_at = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return "hotel"
 
+
 class PackageBooking(models.Model):
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    start_date = models.DateField()
     created_at = models.DateField(auto_now_add=True)
 
     def __str__(self):

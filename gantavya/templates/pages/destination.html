@@ -18,13 +18,15 @@
                 <div class="flex gap-4 justify-end">
                     <button onclick="document.getElementById('bookingModal').classList.add('hidden')"
                             class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
-                    <form method="post" action="{% url 'book_trip' trip.id %}">
-                        {% csrf_token %}
-                        <button type="submit"
-                                class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors duration-300">
-                            Confirm
-                        </button>
-                    </form>
+                    {% if trip.id %}
+                        <form method="post" action="{% url 'book_trip' id=trip.id %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors duration-300">
+                                Confirm
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -37,7 +39,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-2xl"></div>
             {% if trip and not existing_booking %}
                 <button class="absolute top-6 left-6 flex items-center justify-center w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full hover:bg-amber-50 hover:scale-110 transition-all duration-300 shadow-lg group-hover:shadow-xl"
-                   onclick="document.getElementById('bookingModal').classList.remove('hidden')">
+                        onclick="document.getElementById('bookingModal').classList.remove('hidden')">
                     <i class="fa-solid fa-suitcase-rolling text-2xl text-amber-600 transition-colors duration-300"></i>
                 </button>
             {% endif %}
@@ -46,7 +48,6 @@
                 <i class="text-2xl {% if is_favourite %}fa-solid fa-heart text-red-500{% else %}fa-regular fa-heart text-gray-600{% endif %} transition-colors duration-300"></i>
             </button>
         </div>
-
         <div class="mt-12 bg-white rounded-2xl shadow-xl p-8 lg:p-12">
             <div class="flex flex-col gap-6">
                 <div class="inline-flex items-center gap-3 bg-amber-50/80 border border-amber-100 px-4 py-2 rounded-full w-fit">
@@ -90,9 +91,9 @@
                                 <h3 class="text-sm font-semibold text-gray-500 mb-1">PRICE</h3>
                                 <p class="text-gray-900 font-medium">
                                     {% if trip %}
-                                    Rs.{{ trip.price }}
+                                        Rs.{{ trip.price }}
                                     {% else %}
-                                    Not Available
+                                        Not Available
                                     {% endif %}
                                 </p>
                             </div>
@@ -123,7 +124,6 @@
                             <i class="fa-solid fa-chevron-left text-xl text-gray-400"></i>
                         </button>
                     {% endif %}
-
                     {% if trip %}
                         {% if existing_booking %}
                             <button disabled
@@ -133,7 +133,7 @@
                             </button>
                         {% else %}
                             <button onclick="document.getElementById('bookingModal').classList.remove('hidden')"
-                               class="mt-4 aboreto-regular inline-flex items-center px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors duration-300">
+                                    class="mt-4 aboreto-regular inline-flex items-center px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors duration-300">
                                 Book Trip Now
                                 <i class="fa-solid fa-arrow-right ml-2"></i>
                             </button>
@@ -145,7 +145,6 @@
                             <i class="fa-solid fa-xmark ml-2"></i>
                         </button>
                     {% endif %}
-
                     {% if next_destination_id %}
                         <a href="{% url 'destination' id=next_destination_id %}"
                            class="flex items-center justify-center w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full hover:bg-amber-50 hover:scale-110 transition-all duration-300 shadow-lg">

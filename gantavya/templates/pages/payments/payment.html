@@ -1,0 +1,116 @@
+{% extends "includes/layout.html" %}
+{% load static %}
+
+{% block title %}
+    Payment Checkout
+{% endblock title %}
+{% block content %}
+    <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-3xl shadow-xl p-8 lg:p-12 space-y-8">
+                <div class="text-center space-y-4">
+                    <div class="border-b pb-6">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">Complete Your Payment</h1>
+                        <div class="space-y-2">
+                            <h2 class="text-2xl font-semibold text-gray-800">{{ title }}</h2>
+                            <p class="text-gray-600 text-lg">{{ subtitle }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-50/50 p-6 rounded-xl border border-amber-100">
+                        <p class="text-xl font-medium text-gray-700">
+                            Total Amount: <span class="text-3xl font-bold text-amber-700">Rs.{{ total }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Payment Methods Grid -->
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <!-- eSewa -->
+                        <form action="{% url 'pay_with_esewa' %}" method="post" class="group relative cursor-pointer bg-white rounded-xl border-2 border-gray-200 hover:border-lime-500 transition-all duration-300 p-6 hover:shadow-lg">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ id }}">
+                            <button type="submit" class="w-full">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-shrink-0 p-3 bg-lime-50 rounded-lg group-hover:bg-lime-100 transition-colors">
+                                        <img 
+                                            src="{% static 'assets/images/logos/esewa-icon.png' %}"
+                                            alt="eSewa Logo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-gray-900">eSewa</h3>
+                                        <p class="text-sm text-gray-500">Pay with your eSewa account</p>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-lime-600 transition-colors"></i>
+                                </div>
+                            </button>
+                        </form>
+
+                        <!-- Khalti -->
+                        <form action="{% url "pay_with_khalti" %}" method="post" class="group relative cursor-pointer bg-white rounded-xl border-2 border-purple-200 hover:border-purple-800 transition-all duration-300 p-6 hover:shadow-lg">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ id }}">
+                            <button type="submit" class="w-full">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-shrink-0 p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                                        <img 
+                                            src="{% static 'assets/images/logos/khalti-icon.png' %}"
+                                            alt="Khalti Logo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-gray-900">Khalti</h3>
+                                        <p class="text-sm text-gray-500">Pay using Khalti Wallet</p>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-purple-800 transition-colors"></i>
+                                </div>
+                            </button>
+                        </form>
+
+                        <!-- Bank Transfer -->
+                        <form action="/pay-with-bank/" method="post" class="group relative cursor-pointer bg-white rounded-xl border-2 border-gray-200 hover:border-green-500 transition-all duration-300 p-6 hover:shadow-lg">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ id }}">
+                            <button type="submit" class="w-full">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-shrink-0 p-3 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
+                                        <i class="fa-solid fa-building-columns text-3xl text-green-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-gray-900">Bank Transfer</h3>
+                                        <p class="text-sm text-gray-500">Direct bank transfer</p>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-green-600 transition-colors"></i>
+                                </div>
+                            </button>
+                        </form>
+
+                        <!-- Credit/Debit Card -->
+                        <form action="/pay-with-card/" method="post" class="group relative cursor-pointer bg-white rounded-xl border-2 border-gray-200 hover:border-amber-500 transition-all duration-300 p-6 hover:shadow-lg">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ id }}">
+                            <button type="submit" class="w-full">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-shrink-0 p-3 bg-amber-50 rounded-lg group-hover:bg-amber-100 transition-colors">
+                                        <i class="fa-regular fa-credit-card text-3xl text-amber-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-gray-900">Credit/Debit Card</h3>
+                                        <p class="text-sm text-gray-500">Visa, Mastercard</p>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-amber-600 transition-colors"></i>
+                                </div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
