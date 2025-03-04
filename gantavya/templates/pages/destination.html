@@ -3,93 +3,108 @@
     {{ destination.name }} - Destination
 {% endblock title %}
 {% block content %}
-    <div class="mt-8 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl mb-16">
-        <!-- Confirmation Modal -->
-        <div id="bookingModal"
-             class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">Confirm Booking</h3>
-                <div class="text-sm text-gray-600 space-y-1 mb-4">
-                    <p class="font-medium">Destination Details:</p>
-                    <p>Price: ${{ trip.price }}</p>
-                    <p>Travel Days: {{ destination.travelling_days }}</p>
-                </div>
-                <p class="text-gray-600 mb-6">Are you sure you want to book this destination?</p>
-                <div class="flex gap-4 justify-end">
-                    <button onclick="document.getElementById('bookingModal').classList.add('hidden')"
-                            class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
-                    {% if trip.id %}
-                        <form method="post" action="{% url 'book_trip' id=trip.id %}">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors duration-300">
-                                Confirm
-                            </button>
-                        </form>
-                    {% endif %}
-                </div>
+    <div id="bookingModal"
+         class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md transform transition-all">
+            <div class="relative">
+                <img id="modalTripImage"
+                     class="w-full h-48 object-cover rounded-t-2xl"
+                     src=""
+                     alt="Trip Image"
+                     loading="lazy">
             </div>
-        </div>
-        <div class="relative group">
-            <img class="h-64 w-full object-cover rounded-2xl shadow-xl md:h-96 transition-all duration-300"
-                 src="{{ destination.image.url }}"
-                 alt="{{ destination.name }}"
-                 width="1200"
-                 height="600">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-2xl"></div>
-            {% if trip and not existing_booking %}
-                <button class="absolute top-6 left-6 flex items-center justify-center w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full hover:bg-amber-50 hover:scale-110 transition-all duration-300 shadow-lg group-hover:shadow-xl"
-                        onclick="document.getElementById('bookingModal').classList.remove('hidden')">
-                    <i class="fa-solid fa-suitcase-rolling text-2xl text-amber-600 transition-colors duration-300"></i>
-                </button>
-            {% endif %}
-            <button class="favourite-button absolute top-6 right-6 flex items-center justify-center w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full hover:bg-red-50 hover:scale-110 transition-all duration-300 shadow-lg group-hover:shadow-xl"
-                    onclick="toggleFavourite(event, {{ destination.id }}, this)">
-                <i class="text-2xl {% if is_favourite %}fa-solid fa-heart text-red-500{% else %}fa-regular fa-heart text-gray-600{% endif %} transition-colors duration-300"></i>
-            </button>
-        </div>
-        <div class="mt-12 bg-white rounded-2xl shadow-xl p-8 lg:p-12">
-            <div class="flex flex-col gap-6">
-                <div class="inline-flex items-center gap-3 bg-amber-50/80 border border-amber-100 px-4 py-2 rounded-full w-fit">
-                    <svg class="w-6 h-6 text-amber-600"
-                         fill="currentColor"
-                         viewBox="0 0 24 24">
-                        <path d="M12 0C8.686 0 6 2.686 6 6c0 2.925 3.022 6.976 5.41 9.683a1 1 0 001.18 0C14.978 12.976 18 8.925 18 6c0-3.314-2.686-6-6-6zm0 8a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
-                    <span class="text-amber-600 font-semibold text-lg aboreto-regular">{{ destination.city }}</span>
+            <form method="POST" action="{% url "book_trip" %}" class="p-6">
+                {% csrf_token %}
+                <input type="hidden" name="trip_id" id="tripId">
+                <!-- Trip Details Section -->
+                <div class="mb-6 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <h4 id="modalTripName" class="text-lg font-semibold text-gray-900"></h4>
+                        <span id="modalTripPrice"
+                              class="px-3 py-1 bg-amber-100 text-amber-800 text-sm rounded-full"></span>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fa-solid fa-clock mr-2"></i>
+                        <span id="modalTripDuration"></span>
+                    </div>
+                    <p id="modalTripDescription" class="text-sm text-gray-600"></p>
                 </div>
-                <div class="space-y-2 border-b border-gray-100 pb-6">
-                    <h1 class="text-4xl font-bold text-gray-900 tracking-tighter aboreto-regular">{{ destination.name }}</h1>
-                    <div class="flex items-center text-gray-600 gap-2">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
-                        </svg>
-                        <span class="font-medium">{{ destination.location }}</span>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                        <input type="date"
+                               name="start_date"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                               min="{{ today|date:'Y-m-d' }}"
+                               required>
+                    </div>
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button"
+                                onclick="closeBookingModal()"
+                                class="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">Cancel</button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors">
+                            Confirm Booking
+                        </button>
                     </div>
                 </div>
-                <div class="grid gap-6 md:grid-cols-2">
-                    <div class="space-y-6">
-                        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                            <div class="flex-shrink-0 p-3 bg-white rounded-lg shadow-sm">
-                                <svg class="w-6 h-6 text-gray-600"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-500 mb-1">COORDINATES</h3>
-                                <p class="text-gray-900 font-medium">{{ destination.longitude }}, {{ destination.latitude }}</p>
-                            </div>
+            </form>
+        </div>
+    </div>
+    <div class="flex flex-col lg:flex-row justify-center gap-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto my-12">
+        <!-- Destination Section -->
+        <div class="w-full lg:w-2/3">
+            <div class="relative group rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                <img class="h-64 w-full object-cover md:h-96 transition-transform duration-300 transform hover:scale-105"
+                     src="{{ destination.image.url }}"
+                     alt="{{ destination.name }}"
+                     loading="lazy">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                <div class="absolute top-6 right-6 flex gap-4">
+                    {% if trip and not existing_booking %}
+                        <a href="{% url 'book_trip' id=trip.id %}"
+                           class="flex items-center justify-center w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full hover:bg-amber-50 hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl"
+                           aria-label="Book Trip">
+                            <i class="fa-solid fa-suitcase-rolling text-xl text-amber-600"></i>
+                        </a>
+                    {% endif %}
+                    <button class="favourite-button flex items-center justify-center w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full hover:bg-red-50 hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl"
+                            onclick="toggleFavourite(event, {{ destination.id }}, this)"
+                            aria-label="Add to Favorites">
+                        <i class="text-xl {% if is_favourite %}fa-solid fa-heart text-red-500{% else %}fa-regular fa-heart text-gray-600{% endif %}"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mt-8 bg-white rounded-2xl shadow-xl p-6 lg:p-8">
+                <div class="flex flex-col gap-6">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-amber-100 rounded-lg">
+                            <i class="fa-solid fa-location-dot text-amber-600 text-xl"></i>
                         </div>
-                        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                            <div class="flex-shrink-0 p-3 bg-white rounded-lg shadow-sm">
-                                <i class="fa-solid fa-dollar-sign text-gray-600"></i>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">{{ destination.city }}</h2>
+                            <p class="text-gray-600 flex items-center gap-2">
+                                <i class="fa-solid fa-map-pin text-amber-600"></i>
+                                {{ destination.location }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <!-- Key Details -->
+                        <div class="space-y-4">
+                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <i class="fa-solid fa-map-marked text-amber-600"></i>
+                                    <h3 class="text-sm font-semibold text-gray-600">COORDINATES</h3>
+                                </div>
+                                <p class="text-gray-900 font-medium text-lg">{{ destination.longitude }}, {{ destination.latitude }}</p>
                             </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-500 mb-1">PRICE</h3>
-                                <p class="text-gray-900 font-medium">
+                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <i class="fa-solid fa-tag text-amber-600"></i>
+                                    <h3 class="text-sm font-semibold text-gray-600">PRICE</h3>
+                                </div>
+                                <p class="text-gray-900 font-medium text-lg">
                                     {% if trip %}
                                         Rs.{{ trip.price }}
                                     {% else %}
@@ -98,95 +113,107 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                            <div class="flex-shrink-0 p-3 bg-white rounded-lg shadow-sm">
-                                <i class="fa-solid fa-calendar-days text-gray-600"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-500 mb-1">TRAVEL DAYS</h3>
-                                <p class="text-gray-900 font-medium">{{ destination.travelling_days }} Days</p>
-                            </div>
+                        <!-- Description -->
+                        <div class="p-6 bg-amber-50 rounded-xl border border-amber-100">
+                            <h3 class="text-lg font-semibold text-amber-800 mb-4">About {{ destination.name }}</h3>
+                            <p class="text-gray-700 leading-relaxed">{{ destination.description }}</p>
                         </div>
                     </div>
-                    <div class="p-6 bg-amber-50/80 rounded-xl">
-                        <p class="text-lg text-gray-700 leading-loose aboreto-regular">{{ destination.description }}</p>
+                    <!-- Navigation Controls -->
+                    <div class="flex justify-between items-center mt-8">
+                        <div class="flex gap-4">
+                            {% if prev_destination_id %}
+                                <a href="{% url 'destination_detail' id=prev_destination_id %}"
+                                   class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full hover:bg-amber-50 transition-colors">
+                                    <i class="fa-solid fa-chevron-left text-amber-600"></i>
+                                    <span class="text-gray-700">Previous</span>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="flex gap-4">
+                            {% if next_destination_id %}
+                                <a href="{% url 'destination_detail' id=next_destination_id %}"
+                                   class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full hover:bg-amber-50 transition-colors">
+                                    <span class="text-gray-700">Next</span>
+                                    <i class="fa-solid fa-chevron-right text-amber-600"></i>
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-                <div class="flex items-center px-4 mb-4 gap-8 justify-between">
-                    {% if prev_destination_id %}
-                        <a href="{% url 'destination' id=prev_destination_id %}"
-                           class="flex items-center justify-center w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full hover:bg-amber-50 hover:scale-110 transition-all duration-300 shadow-lg">
-                            <i class="fa-solid fa-chevron-left text-xl text-amber-600"></i>
-                        </a>
-                    {% else %}
-                        <button disabled
-                                class="flex items-center justify-center w-12 h-12 bg-gray-100 backdrop-blur-sm rounded-full cursor-not-allowed shadow-lg">
-                            <i class="fa-solid fa-chevron-left text-xl text-gray-400"></i>
-                        </button>
-                    {% endif %}
-                    {% if trip %}
-                        {% if existing_booking %}
-                            <button disabled
-                                    class="mt-4 aboreto-regular inline-flex items-center px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg cursor-not-allowed">
-                                Already Booked
-                                <i class="fa-solid fa-check ml-2"></i>
-                            </button>
-                        {% else %}
-                            <button onclick="document.getElementById('bookingModal').classList.remove('hidden')"
-                                    class="mt-4 aboreto-regular inline-flex items-center px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors duration-300">
-                                Book Trip Now
-                                <i class="fa-solid fa-arrow-right ml-2"></i>
-                            </button>
-                        {% endif %}
-                    {% else %}
-                        <button disabled
-                                class="mt-4 aboreto-regular inline-flex items-center px-6 py-3 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed">
-                            No Trip Available
-                            <i class="fa-solid fa-xmark ml-2"></i>
-                        </button>
-                    {% endif %}
-                    {% if next_destination_id %}
-                        <a href="{% url 'destination' id=next_destination_id %}"
-                           class="flex items-center justify-center w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full hover:bg-amber-50 hover:scale-110 transition-all duration-300 shadow-lg">
-                            <i class="fa-solid fa-chevron-right text-xl text-amber-600"></i>
-                        </a>
-                    {% else %}
-                        <button disabled
-                                class="flex items-center justify-center w-12 h-12 bg-gray-100 backdrop-blur-sm rounded-full cursor-not-allowed shadow-lg">
-                            <i class="fa-solid fa-chevron-right text-xl text-gray-400"></i>
-                        </button>
-                    {% endif %}
                 </div>
             </div>
         </div>
-        <div class="mt-12 text-center">
-            <a class="aboreto-regular inline-flex items-center px-8 py-4 bg-white text-amber-600 font-semibold rounded-xl hover:bg-amber-50 ring-2 ring-amber-500 ring-inset transition-all duration-300 hover:px-10"
-               href="{% url 'destinations' %}">
-                <svg class="w-5 h-5 mr-2"
-                     fill="none"
-                     stroke="currentColor"
-                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Explore More Destinations
-            </a>
+        <!-- Trips Section -->
+        <div class="w-full lg:w-1/3">
+            <div class="sticky top-8 bg-white rounded-2xl shadow-xl p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Available Trips</h2>
+                <div class="space-y-4">
+                    {% for trip in trips %}
+                        <div class="group relative bg-white border border-gray-200 rounded-xl p-4 hover:border-amber-200 transition-all">
+                            <div class="flex flex-col gap-3">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-semibold text-gray-800">{{ trip.name }}</h3>
+                                    <span class="px-3 py-1 bg-amber-100 text-amber-800 text-sm rounded-full">Rs.{{ trip.price }}</span>
+                                </div>
+                                <p class="text-sm text-gray-600 line-clamp-3">{{ trip.description }}</p>
+                                <div class="flex items-center justify-between mt-2">
+                                    <span class="text-sm text-gray-500">
+                                        <i class="fa-solid fa-clock mr-2"></i>{{ trip.travelling_days }} days
+                                    </span>
+                                    <button onclick="showBookingModal(this)"
+                                            class="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition-colors"
+                                            data-trip-id="{{ trip.id }}"
+                                            data-trip-name="{{ trip.name }}"
+                                            data-trip-price="Rs.{{ trip.price }}"
+                                            data-trip-duration="{{ trip.travelling_days }} days"
+                                            data-trip-description="{{ trip.description }}"
+                                            data-trip-image="{{ trip.image.url }}">Book Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="w-full text-center">No Trips Available Currently</div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
+    </div>
+    <!-- Explore More Button -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-16">
+        <a href="{% url 'destinations_list' %}"
+           class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-full hover:shadow-lg transition-all">
+            <i class="fa-solid fa-compass mr-2"></i>
+            Explore More Destinations
+        </a>
     </div>
 {% endblock content %}
 {% block javascript %}
     <script>
-    function toggleFavourite(event, id, button) {
-        event.preventDefault();
-        const icon = button.children[0];
-        button.classList.toggle('active:scale-95');
-        
-        icon.classList.toggle('fa-regular');
-        icon.classList.toggle('fa-solid');
-        icon.classList.toggle('text-red-500');
-        icon.classList.toggle('text-gray-600');
-        
-        fetch(`/add-to-favourites/?id=${id}&context=destination`)
-            .catch(error => console.error('Error:', error));
+    function showBookingModal(button) {
+        const tripData = {
+            id: button.dataset.tripId,
+            name: button.dataset.tripName,
+            price: button.dataset.tripPrice,
+            duration: button.dataset.tripDuration,
+            description: button.dataset.tripDescription,
+            image: button.dataset.tripImage
+        };
+    
+        // Update modal content
+        document.getElementById('tripId').value = tripData.id;
+        document.getElementById('modalTripImage').src = tripData.image;
+        document.getElementById('modalTripName').textContent = tripData.name;
+        document.getElementById('modalTripPrice').textContent = tripData.price;
+        document.getElementById('modalTripDuration').textContent = tripData.duration;
+        document.getElementById('modalTripDescription').textContent = tripData.description;
+    
+        // Show modal
+        document.getElementById('bookingModal').classList.remove('hidden');
+        document.querySelector('#bookingModal input[type="date"]').min = new Date().toISOString().split('T')[0];
+    }
+    
+    function closeBookingModal() {
+        document.getElementById('bookingModal').classList.add('hidden');
     }
     </script>
 {% endblock javascript %}

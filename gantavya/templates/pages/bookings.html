@@ -11,61 +11,61 @@
                 {% for booking in upcoming_bookings %}
                     <div class="group flex items-center gap-6 p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-300">
                         <div class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
-                            {% if booking|lower == "trip" %}
+                            {% if booking.booking_type == 'trip' %}
                                 <img src="{{ booking.trip.destination.image.url }}"
                                      alt="{{ booking.trip.destination.name }}"
                                      class="w-full h-full object-cover">
-                            {% elif booking|lower == "activity" %}
+                            {% elif booking.booking_type == 'activity' %}
                                 <img src="{{ booking.activity.image.url }}"
                                      alt="{{ booking.activity.name }}"
                                      class="w-full h-full object-cover">
-                            {% elif booking|lower == "package" %}
+                            {% elif booking.booking_type == 'package' %}
                                 <img src="{{ booking.package.image.url }}"
                                      alt="{{ booking.package.name }}"
                                      class="w-full h-full object-cover">
+                            {% elif booking.booking_type == 'hotel' %}
+                                <img src="{{ booking.hotel.image.url }}"
+                                     alt="{{ booking.hotel.name }}"
+                                     class="w-full h-full object-cover">
                             {% endif %}
+
                         </div>
                         <div class="flex-1 min-w-0">
                             <h3 class="text-lg font-semibold text-gray-900 truncate aboreto-regular">
-                                {% if booking|lower == "trip" %}
-                                    {{ booking.trip.destination.name }}
-                                {% elif booking|lower == "activity" %}
+                                {% if booking.booking_type == 'trip' %}
+                                    {{ booking.trip.name }}
+                                {% elif booking.booking_type == 'activity' %}
                                     {{ booking.activity.name }}
-                                {% elif booking|lower == "package" %}
+                                {% elif booking.booking_type == 'package' %}
                                     {{ booking.package.name }}
+                                {% elif booking.booking_type == 'hotel' %}
+                                    {{ booking.hotel.name }}
                                 {% endif %}
                             </h3>
                             <div class="flex items-center gap-4 mt-2">
                                 <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
                                     <i class="fa-regular fa-calendar text-amber-600"></i>
-                                    <span>{{ booking.created_at|date:"M d, Y" }}</span>
-                                </div>
-                                {% if booking|lower == "trip" %}
-                                <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
-                                    <i class="fa-solid fa-calendar-days text-amber-600"></i>
-                                    <span>{{ booking.trip.destination.travelling_days }} Days</span>
-                                </div>
-                                {% elif booking|lower == "package" %}
-                                <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
-                                    <i class="fa-solid fa-calendar-days text-amber-600"></i>
-                                    <span>{{ booking.package.duration }} Days</span>
-                                </div>
-                                {% endif %}
-                                <div class="inline-flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full {% if booking|lower == 'trip' %}bg-amber-100 text-amber-800 {% elif booking|lower == 'package' %}bg-purple-100 text-purple-800 {% else %}bg-blue-100 text-blue-800{% endif %}">
-                                    <i class="{% if booking|lower == 'trip' %}fa-solid fa-suitcase text-xs{% elif booking|lower == 'package' %}fa-solid fa-gift text-xs{% else %}fa-solid fa-ticket text-xs{% endif %}"></i>
-                                    <span class="aboreto-regular">
-                                        {% if booking|lower == "trip" %}
-                                            Adventure Trip
-                                        {% elif booking|lower == "package" %}
-                                            Custom Package
+                                    <span>
+                                        {% if booking.booking_type == 'hotel' %}
+                                            {{ booking.start_date|date:"M d, Y" }} - {{ booking.to_date|date:"M d, Y" }}
                                         {% else %}
-                                            Local Activity
+                                            {{ booking.start_date|date:"M d, Y" }}
                                         {% endif %}
                                     </span>
                                 </div>
+                                <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
+                                    <i class="fa-solid fa-tag text-amber-600"></i>
+                                    <span>Rs. {{ booking.price }}</span>
+                                </div>
+                                <div class="inline-flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full {% if booking.booking_type == 'trip' %}bg-amber-100 text-amber-800 {% elif booking.booking_type == 'package' %}bg-purple-100 text-purple-800 {% elif booking.booking_type == 'hotel' %}bg-blue-100 text-blue-800 {% else %}bg-green-100 text-green-800{% endif %}">
+                                    <i class="fas {% if booking.booking_type == 'trip' %}fa-map-marker-alt {% elif booking.booking_type == 'package' %}fa-gift {% elif booking.booking_type == 'hotel' %}fa-hotel {% else %}fa-ticket{% endif %} text-xs"></i>
+                                    <span class="aboreto-regular">{{ booking.get_booking_type_display }}</span>
+                                </div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-gray-400 text-lg ml-auto pr-2"></i>
+                        <a href="{% url 'booking_detail' id=booking.id %}" class="ml-auto pr-2">
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-lg hover:text-amber-600 transition-colors"></i>
+                        </a>
                     </div>
                 {% empty %}
                     <div class="text-center py-12 space-y-4">
@@ -84,28 +84,34 @@
                 {% for booking in past_bookings %}
                     <div class="group flex items-center gap-6 p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-300">
                         <div class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden grayscale">
-                            {% if booking|lower == "trip" %}
+                            {% if booking.booking_type == 'trip' %}
                                 <img src="{{ booking.trip.destination.image.url }}"
                                      alt="{{ booking.trip.destination.name }}"
                                      class="w-full h-full object-cover">
-                            {% elif booking|lower == "activity" %}
+                            {% elif booking.booking_type == 'activity' %}
                                 <img src="{{ booking.activity.image.url }}"
                                      alt="{{ booking.activity.name }}"
                                      class="w-full h-full object-cover">
-                            {% elif booking|lower == "package" %}
+                            {% elif booking.booking_type == 'package' %}
                                 <img src="{{ booking.package.image.url }}"
                                      alt="{{ booking.package.name }}"
+                                     class="w-full h-full object-cover">
+                            {% elif booking.booking_type == 'hotel' %}
+                                <img src="{{ booking.hotel.image.url }}"
+                                     alt="{{ booking.hotel.name }}"
                                      class="w-full h-full object-cover">
                             {% endif %}
                         </div>
                         <div class="flex-1 min-w-0">
                             <h3 class="text-lg font-semibold text-gray-900 truncate aboreto-regular">
-                                {% if booking|lower == "trip" %}
-                                    {{ booking.trip.destination.name }}
-                                {% elif booking|lower == "activity" %}
+                                {% if booking.booking_type == 'trip' %}
+                                    {{ booking.trip.name }}
+                                {% elif booking.booking_type == 'activity' %}
                                     {{ booking.activity.name }}
-                                {% elif booking|lower == "package" %}
+                                {% elif booking.booking_type == 'package' %}
                                     {{ booking.package.name }}
+                                {% elif booking.booking_type == 'hotel' %}
+                                    {{ booking.hotel.name }}
                                 {% endif %}
                             </h3>
                             <div class="flex items-center gap-4 mt-2">
@@ -113,24 +119,15 @@
                                     <i class="fa-regular fa-calendar text-amber-600"></i>
                                     <span>{{ booking.created_at|date:"M d, Y" }}</span>
                                 </div>
-                                {% if booking|lower == "trip" %}
-                                <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
-                                    <i class="fa-solid fa-calendar-days text-amber-600"></i>
-                                    <span>{{ booking.trip.destination.travelling_days }} Days</span>
-                                </div>
-                                {% elif booking|lower == "package" %}
-                                <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
-                                    <i class="fa-solid fa-calendar-days text-amber-600"></i>
-                                    <span>{{ booking.package.duration }} Days</span>
-                                </div>
-                                {% endif %}
                                 <div class="inline-flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">
                                     <i class="fa-solid fa-check-circle text-xs"></i>
                                     <span class="aboreto-regular">Completed Journey</span>
                                 </div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-gray-400 text-lg ml-auto pr-2"></i>
+                        <a href="{% url 'booking_detail' booking.id %}" class="ml-auto pr-2">
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-lg hover:text-amber-600 transition-colors"></i>
+                        </a>
                     </div>
                 {% empty %}
                     <div class="text-center py-12 space-y-4">

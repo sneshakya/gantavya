@@ -1,221 +1,321 @@
+from email.policy import default
+from uuid import uuid1
 from django.db import models
-
+from django.utils.translation import gettext_lazy as _
+from django.core.validators import MinValueValidator, MaxValueValidator
 from accounts.models import CustomUser
+from payments.models import PaymentHistory
 
 
-# Create your models here.
-class Destination(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    image = models.ImageField(
-        upload_to="images/destination/", default="images/destination/default.jpg"
+class BaseModel(models.Model):
+    """Abstract base model with common fields"""
+
+    product_code = models.CharField(
+        _("product code"), default=uuid1(), editable=False, max_length=100
     )
-    longitude = models.DecimalField(max_digits=10, decimal_places=6)
-    latitude = models.DecimalField(max_digits=10, decimal_places=6)
-    city = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
-    travelling_days = models.IntegerField()
+
+    created_at = models.DateField(_("created at"), auto_now_add=True)
+    updated_at = models.DateField(_("updated at"), auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class FavouriteBaseModel(BaseModel):
+    """Abstract model for favorite relationships"""
+
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="%(class)ss"
+    )
+
+    class Meta:
+        abstract = True
+
+
+class ReviewBaseModel(BaseModel):
+    """Abstract model for reviews"""
+
+    comment = models.TextField(_("comment"))
+    rating = models.IntegerField(
+        _("rating"), validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+
+    class Meta:
+        abstract = True
+        ordering = ("-created_at",)
+
+
+class BookingBaseModel(BaseModel):
+    """Abstract model for bookings"""
+
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="%(class)ss"
+    )
+    start_date = models.DateField(_("start date"))
+    transaction_id = models.ForeignKey(
+        PaymentHistory, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    class Meta:
+        abstract = True
+        ordering = ("-start_date",)
+
+
+class Destination(models.Model):
+    name = models.CharField(_("name"), max_length=100)
+    description = models.TextField(_("description"), blank=True)
+    image = models.ImageField(
+        _("image"),
+        upload_to="images/destination/",
+        default="images/destination/default.jpg",
+    )
+    longitude = models.DecimalField(_("longitude"), max_digits=10, decimal_places=6)
+    latitude = models.DecimalField(_("latitude"), max_digits=10, decimal_places=6)
+    city = models.CharField(_("city"), max_length=100)
+    location = models.CharField(_("location"), max_length=100)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = _("destination")
+        verbose_name_plural = _("destinations")
 
 
 class Trip(models.Model):
-    destination = models.ForeignKey(Destination, on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to="images/trip/", default="images/trip/default.jpg"
+    name = models.CharField(_("trip name"), default="trip", max_length=50)
+    destination = models.ForeignKey(
+        Destination, on_delete=models.CASCADE, related_name="trips"
     )
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(
+        _("image"), upload_to="images/trip/", default="images/trip/default.jpg"
+    )
+    price = models.DecimalField(_("price"), max_digits=10, decimal_places=2)
+    description = models.CharField(
+        _("trip description"), default="Description", max_length=500
+    )
+    travelling_days = models.IntegerField(_("travelling days"), default=0)
 
     def __str__(self):
-        return self.destination.name
+        return f"{self.destination.name} Trip"
+
+    class Meta:
+        verbose_name = _("trip")
+        verbose_name_plural = _("trips")
 
 
-class Activity(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+class Activity(BaseModel):
+    name = models.CharField(_("name"), max_length=100)
+    description = models.TextField(_("description"), blank=True)
     image = models.ImageField(
-        upload_to="images/activities/", default="images/activities/default.jpg"
+        _("image"),
+        upload_to="images/activities/",
+        default="images/activities/default.jpg",
     )
-    location = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    location = models.CharField(_("location"), max_length=100)
+    city = models.CharField(_("city"), max_length=100)
+    price = models.FloatField(default=1000)
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = _("activity")
+        verbose_name_plural = _("activities")
+        ordering = ("-created_at",)
 
-class Package(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+
+class Package(BaseModel):
+    name = models.CharField(_("name"), max_length=100)
+    description = models.TextField(_("description"), blank=True)
     image = models.ImageField(
-        upload_to="images/package/", default="images/package/default.jpg"
+        _("image"), upload_to="images/package/", default="images/package/default.jpg"
     )
-    location = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=20, decimal_places=2)
-    duration = models.IntegerField()
-    facilities = models.TextField(blank=True)
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    location = models.CharField(_("location"), max_length=100)
+    price = models.DecimalField(_("price"), max_digits=20, decimal_places=2)
+    duration = models.IntegerField(_("duration"))
+    facilities = models.TextField(_("facilities"), blank=True)
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = _("package")
+        verbose_name_plural = _("packages")
 
-class Hotel(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+
+class Hotel(BaseModel):
+    name = models.CharField(_("name"), max_length=100)
+    description = models.TextField(_("description"), blank=True)
     image = models.ImageField(
-        upload_to="images/hotel/", default="images/hotel/default.jpg"
+        _("image"), upload_to="images/hotel/", default="images/hotel/default.jpg"
     )
-    location = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    location = models.CharField(_("location"), max_length=100)
+    city = models.CharField(_("city"), max_length=100)
+    price = models.FloatField(_("price per night"), default=1000)
+    rating = models.IntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
 
     def __str__(self):
         return self.name
 
-
-# Images
-class TripImage(models.Model):
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="images/")
-    created_at = models.DateField(auto_now_add=True)
+    class Meta:
+        verbose_name = _("hotel")
+        verbose_name_plural = _("hotels")
 
 
-class HotelImage(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to="images/hotel_images/", default="images/hotel_images/default.jpg"
+class ImageModel(BaseModel):
+    """Abstract model for image relationships"""
+
+    image = models.ImageField(_("image"), upload_to="images/")
+
+    class Meta:
+        abstract = True
+
+
+class TripImage(ImageModel):
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="images")
+
+
+class HotelImage(ImageModel):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name="images")
+    upload_to = "images/hotel_images/"
+    default = "images/hotel_images/default.jpg"
+
+    def __str__(self):
+        return f"{self.hotel.name} Image"
+
+
+class PackageImage(ImageModel):
+    package = models.ForeignKey(
+        Package, on_delete=models.CASCADE, related_name="images"
     )
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
-
-    def __str__(self):
-        return self.name
+    upload_to = "images/package_images/"
+    default = "images/package_images/default.jpg"
 
 
-class PackageImage(models.Model):
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to="images/package_images/", default="images/package_images/default.jpg"
+class ActivityImage(ImageModel):
+    activity = models.ForeignKey(
+        Activity, on_delete=models.CASCADE, related_name="images"
     )
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    upload_to = "images/activity_images/"
+    default = "images/activity_images/default.jpg"
 
 
-class ActivityImage(models.Model):
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to="images/activity_images/",
-        default="images/activity_images/default.jpg",
+class TripBooking(BookingBaseModel):
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="bookings")
+
+    def __str__(self):
+        return f"{self.trip.destination.name} booking by {self.user.email}"
+
+
+class ActivityBooking(BookingBaseModel):
+    activity = models.ForeignKey(
+        Activity, on_delete=models.CASCADE, related_name="bookings"
     )
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
-
-
-# Bookings
-class TripBooking(models.Model):
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    created_at = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return "trip"
+        return f"{self.activity.name} booking by {self.user.email}"
 
 
-class ActivityBooking(models.Model):
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    created_at = models.DateField(auto_now_add=True)
-    
-    def __str__(self):
-        return "activity"
-
-
-class HotelBooking(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    from_date = models.DateField()
-    to_date = models.DateField()
-    created_at = models.DateField(auto_now_add=True)
+class HotelBooking(BookingBaseModel):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name="bookings")
+    to_date = models.DateField(_("to date"))
 
     def __str__(self):
-        return "hotel"
+        return f"{self.hotel.name} booking by {self.user.email}"
 
 
-class PackageBooking(models.Model):
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    created_at = models.DateField(auto_now_add=True)
+class PackageBooking(BookingBaseModel):
+    package = models.ForeignKey(
+        Package, on_delete=models.CASCADE, related_name="bookings"
+    )
 
     def __str__(self):
-        return "package"
+        return f"{self.package.name} booking by {self.user.email}"
 
 
-# Favourites
-class FavouriteTrip(models.Model):
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class FavouriteTrip(FavouriteBaseModel):
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="favourites")
+
+    class Meta(FavouriteBaseModel.Meta):
+        verbose_name = _("favorite trip")
+        verbose_name_plural = _("favorite trips")
+        unique_together = (("user", "trip"),)
 
 
-class FavouriteDestination(models.Model):
-    destination = models.ForeignKey(Destination, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class FavouriteDestination(FavouriteBaseModel):
+    destination = models.ForeignKey(
+        Destination, on_delete=models.CASCADE, related_name="favourites"
+    )
+
+    class Meta(FavouriteBaseModel.Meta):
+        verbose_name = _("favorite destination")
+        verbose_name_plural = _("favorite destinations")
+        unique_together = (("user", "destination"),)
 
 
-class FavouriteHotel(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class FavouriteHotel(FavouriteBaseModel):
+    hotel = models.ForeignKey(
+        Hotel, on_delete=models.CASCADE, related_name="favourites"
+    )
+
+    class Meta(FavouriteBaseModel.Meta):
+        verbose_name = _("favorite hotel")
+        verbose_name_plural = _("favorite hotels")
+        unique_together = (("user", "hotel"),)
 
 
-class FavouritePackage(models.Model):
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class FavouritePackage(FavouriteBaseModel):
+    package = models.ForeignKey(
+        Package, on_delete=models.CASCADE, related_name="favourites"
+    )
+
+    class Meta(FavouriteBaseModel.Meta):
+        verbose_name = _("favorite package")
+        verbose_name_plural = _("favorite packages")
+        unique_together = (("user", "package"),)
 
 
-class FavouriteActivity(models.Model):
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class FavouriteActivity(FavouriteBaseModel):
+    activity = models.ForeignKey(
+        Activity, on_delete=models.CASCADE, related_name="favourites"
+    )
+
+    class Meta(FavouriteBaseModel.Meta):
+        verbose_name = _("favorite activity")
+        verbose_name_plural = _("favorite activities")
+        unique_together = (("user", "activity"),)
 
 
-# Reviews
-class TripReview(models.Model):
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    comment = models.TextField()
-    rating = models.IntegerField()
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+class TripReview(ReviewBaseModel):
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="reviews")
+
+    def __str__(self):
+        return f"Review for {self.trip} by {self.user.email}"
 
 
-class ActivityReview(models.Model):
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    comment = models.TextField()
-    rating = models.IntegerField()
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+class ActivityReview(ReviewBaseModel):
+    activity = models.ForeignKey(
+        Activity, on_delete=models.CASCADE, related_name="reviews"
+    )
+
+    def __str__(self):
+        return f"Review for {self.activity} by {self.user.email}"
 
 
-class HotelReview(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    comment = models.TextField()
-    rating = models.IntegerField()
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+class HotelReview(ReviewBaseModel):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name="reviews")
+
+    def __str__(self):
+        return f"Review for {self.hotel} by {self.user.email}"
 
 
-class PackageReview(models.Model):
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    comment = models.TextField()
-    rating = models.IntegerField()
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+class PackageReview(ReviewBaseModel):
+    package = models.ForeignKey(
+        Package, on_delete=models.CASCADE, related_name="reviews"
+    )
+
+    def __str__(self):
+        return f"Review for {self.package} by {self.user.email}"

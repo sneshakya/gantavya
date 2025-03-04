@@ -1,17 +1,29 @@
 import base64
-from datetime import date
-import datetime
 import hashlib
 import hmac
 import json
-from uuid import uuid4
+import requests
+from uuid import uuid1, uuid4
+from datetime import datetime
 
 from django.shortcuts import redirect, render
-import requests
+from django.core.cache import cache
+
+from payments.models import PaymentHistory
+from trips.models import Hotel
+from trips.views import add_booking
 
 
 def payment_page(request):
-    return render(request, "pages/payment/payment.html")
+    return render(request, "pages/payments/payment.html")
+
+
+def payment_success(request):
+    return render(request, "pages/payments/success.html")
+
+
+def payment_failure(request):
+    return render(request, "pages/payments/failure.html")
 
 
 def generate_signature(msg):
@@ -25,9 +37,25 @@ def generate_signature(msg):
 
 def pay_with_esewa(request):
     if request.method == "POST":
+        cache_data = cache.get("booking")
+        if cache_data == None:
+            return render(request, "500.html")
+
+        product = cache_data["data"]
+
         target_url = "https://rc-epay.esewa.com.np/api/epay/main/v2/form"
 
-        total_amount = "1010"
+        if isinstance(product, Hotel):
+            start_date = cache_data["start_date"]
+            to_date = cache_data["to_date"]
+
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(to_date, "%Y-%m-%d")
+            total_days = (end - start).days
+            total_amount = product.price * total_days
+        else:
+            total_amount = str(round(product.price))
+
         transaction_uuid = uuid4()
         product_code = "EPAYTEST"
 
@@ -35,15 +63,15 @@ def pay_with_esewa(request):
         signature = generate_signature(msg)
 
         payload = {
-            "amount": "1000",
-            "tax_amount": "10",
+            "amount": f"{total_amount}",
+            "tax_amount": "0",
             "product_service_charge": "0",
             "product_delivery_charge": "0",
             "product_code": f"{product_code}",
             "total_amount": f"{total_amount}",
             "transaction_uuid": f"{transaction_uuid}",
-            "success_url": "http://localhost:8000/",
-            "failure_url": "http://localhost:8000/",
+            "success_url": "http://localhost:8000/verify-esewa",
+            "failure_url": "http://localhost:8000/payment-failure",
             "signed_field_names": "total_amount,transaction_uuid,product_code",
             "signature": f"{signature}",
         }
@@ -51,39 +79,123 @@ def pay_with_esewa(request):
         response = requests.post(target_url, data=payload)
         if response.status_code == 200:
             return redirect(response.url)
-        else:
-            return render(request, "500.html")
+
+    return render(request, "500.html")
 
 
 def pay_with_khalti(request):
-    url = "https://dev.khalti.com/api/v2/epayment/initiate/"
-    payload = json.dumps(
-        {
-            "return_url": "http://localhost:8000/",
+    if request.method == "POST":
+        cache_data = cache.get("booking")
+        if cache_data == None:
+            return render(request, "500.html")
+
+        product = cache_data["data"]
+
+        if isinstance(product, Hotel):
+            start_date = cache_data["start_date"]
+            to_date = cache_data["to_date"]
+
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(to_date, "%Y-%m-%d")
+            total_days = (end - start).days
+            total_amount = product.price * total_days
+        else:
+            total_amount = round(product.price)
+
+        purchase_id = uuid4().__str__()
+        customer_info = {
+            "name": request.user.full_name(),
+            "email": request.user.email,
+            "phone": request.user.phone_number,
+        }
+
+        raw_payload = {
+            "return_url": "http://localhost:8000/verify-khalti",
             "website_url": "http://localhost:8000",
-            "amount": 10 * 100,
-            "purchase_order_id": 1,
-            "purchase_order_name": "TESTKHALTI",
-            "customer_info": {
-                "name": request.user.full_name(),
-                "email": request.user.email,
-                "phone": request.user.phone_number,
-            },
+            "amount": round(total_amount * 100),
+            "purchase_order_id": purchase_id,
+            "purchase_order_name": product.product_code,
+            "customer_info": customer_info,
             "amount_breakdown": [
-                {"label": "Mark Price", "amount": 10 * 100},
+                {"label": "Mark Price", "amount": round(total_amount * 100)},
                 {"label": "VAT", "amount": 0},
             ],
         }
-    )
 
-    headers = {
-        "Authorization": "Key dcb5a1bfaa9248cca4068fb95ffa0438",
-        "Content-Type": "application/json",
-    }
-    response = requests.post(url, headers=headers, data=payload)
-    print(response.content)
+        print(raw_payload)
 
-    if response.status_code == 200:
-        return redirect(response.json()["payment_url"])
-    else:
-        return render(request, "500.html")
+        url = "https://dev.khalti.com/api/v2/epayment/initiate/"
+        payload = json.dumps(raw_payload)
+
+        headers = {
+            "Authorization": "Key dcb5a1bfaa9248cca4068fb95ffa0438",
+            "Content-Type": "application/json",
+        }
+        response = requests.post(url, headers=headers, data=payload)
+        print(response.content)
+
+        if response.status_code == 200:
+            return redirect(response.json()["payment_url"])
+
+    return render(request, "500.html")
+
+
+def verify_esewa(request):
+    if request.method == "GET":
+        encoded_data = request.GET.get("data", None)
+
+        if encoded_data:
+            decoded_data = base64.b64decode(encoded_data)
+            decoded_data = json.loads(decoded_data)
+
+            if decoded_data["status"] == "COMPLETE":
+                transaction_id = decoded_data["transaction_uuid"]
+                total_amount = decoded_data["total_amount"].replace(",", "")
+
+                try:
+                    # Save the transaction to the database
+                    payment_history = PaymentHistory(
+                        transaction_id=transaction_id,
+                        user=request.user,
+                        total_payment=total_amount,
+                        payment_via=PaymentHistory.PaymentMethod.ESEWA,
+                    )
+                    payment_history.save()
+
+                    add_booking(request.user, payment_history.transaction_id)
+
+                    return redirect("payment_success")
+                except:
+                    return render(request, "500.html")
+
+    return redirect("payment_failure")
+
+
+def verify_khalti(request):
+    if request.method == "GET":
+        status = request.GET.get("status", "Failed")
+
+        if status == "Completed":
+            pidx = request.GET.get("pidx")
+            transaction_id = request.GET.get("transaction_id")
+            amount = request.GET.get("amount")
+            total_amount = request.GET.get("total_amount")
+            purchase_order_id = request.GET.get("purchase_order_id")
+            purchase_order_name = request.GET.get("purchase_order_name")
+
+            try:
+                # Save the transaction to the database
+                PaymentHistory.objects.create(
+                    transaction_id=transaction_id,
+                    user=request.user,
+                    total_payment=total_amount,
+                    payment_via=PaymentHistory.PaymentMethod.KHALTI,
+                )
+
+                add_booking(request.user)
+
+                return redirect("payment_success")
+            except:
+                return render(request, "500.html")
+
+    return redirect("payment_failure")

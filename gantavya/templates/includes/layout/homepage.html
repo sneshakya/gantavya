@@ -8,7 +8,7 @@ Homepage
 
 {% block content %}
 
-<div class="max-h-screen overflow-hidden w-full aboreto-regular bg-gradient-to-b from-amber-50 to-white">
+<div class="w-full aboreto-regular bg-gradient-to-b from-amber-50 to-white">
 	<div class="w-full py-8 sm:px-16">
 		<div class="mb-8 font-bold text-3xl text-center text-gray-800 tracking-wide">
 			<span class="text-amber-600">"YOUR JOURNEY,</span> 
@@ -17,7 +17,7 @@ Homepage
 
 		<nav class="sm:flex text-center justify-center gap-4 mb-8 font-medium">
 			<a
-				href="{% url 'destinations' %}"
+				href="{% url 'destinations_list' %}"
 				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
 						{% if 'destination' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
@@ -26,7 +26,7 @@ Homepage
 			</a>
 
 			<a
-				href="{% url 'hotels' %}"
+				href="{% url 'hotels_list' %}"
 				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
 						{% if 'hotels' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
@@ -35,7 +35,7 @@ Homepage
 			</a>
 
 			<a
-				href="{% url 'activities' %}"
+				href="{% url 'activities_list' %}"
 				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
 						{% if 'activities' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
@@ -44,7 +44,7 @@ Homepage
 			</a>
 
 			<a 
-				href="{% url 'packages' %}"
+				href="{% url 'packages_list' %}"
 				class="py-2.5 px-6 hover:bg-amber-400 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2
 						{% if 'packages' in request.path %}bg-amber-400 text-white shadow-md{% else %}text-gray-700{% endif %}"
 			>
@@ -79,13 +79,12 @@ Homepage
 		</div>
 	</div>
 
-	<div class="mx-8 overflow-y-auto h-[calc(100vh-250px)] scrollbar-thin scrollbar-thumb-amber-400 scrollbar-track-amber-100 lg:mx-64">
+	<div class="mx-8 lg:mx-64">
 		<div class="pb-8">
 			{% block inner_content %}
 			{% endblock inner_content %}
 		</div>
 	</div>
-
 </div>
 
 {% endblock content %}

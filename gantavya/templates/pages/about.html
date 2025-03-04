@@ -7,82 +7,168 @@ About
 
 {% block content %}
 <div class="aboreto-regular">
-    <div class="relative my-8 min-h-[500px] bg-[url('/staticfiles/assets/images/about1.png')] bg-fixed bg-center bg-cover bg-no-repeat shadow-xl overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/70 to-slate-900/30 flex items-center">
-            <div class="px-8 md:px-16 lg:px-48">
-                <h1 class="text-white text-4xl md:text-5xl font-bold leading-tight">About Gantavya</h1>
-                <p class="text-white/80 mt-4 max-w-2xl text-lg">Your trusted companion for seamless travel experiences in Nepal</p>
+    <!-- Hero Section -->
+    <section class="relative h-[70vh] bg-[url('/staticfiles/assets/images/about1.png')] bg-fixed bg-cover bg-center shadow-2xl overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent">
+            <div class="container mx-auto h-full flex items-center px-8 md:px-16 lg:px-24">
+                <div class="max-w-2xl space-y-6 text-center md:text-left">
+                    <h1 class="text-5xl md:text-6xl font-bold text-white animate-fade-in-down">
+                        Crafting Unforgettable<br>
+                        <span class="text-amber-400">Nepalese Adventures</span>
+                    </h1>
+                    <p class="text-xl text-white/90 font-light animate-fade-in-up delay-100">
+                        Your gateway to authentic Himalayan experiences since 2015
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="container mx-auto px-8 mb-16">
-        <div class="grid lg:grid-cols-5 gap-12">
+    <!-- Main Content -->
+    <main class="container mx-auto px-8 my-24">
+        <div class="grid lg:grid-cols-5 gap-16">
+            <!-- Left Column -->
             <div class="lg:col-span-3 space-y-16">
-                <div class="transform hover:scale-105 transition-transform duration-300 bg-white rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Welcome to Gantavya!</h2>
-                    <p class="text-gray-600 leading-relaxed">
-                        Gantavya aims to provide a seamless and efficient platform for users to explore, plan, and book their trips with ease.
-                        Whether it's a business trip or a vacation, our goal is to ensure a hassle-free experience tailored to your preferences.
-                    </p>
-                </div>
-
-                <div class="transform hover:scale-105 transition-transform duration-300 bg-white rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Our Mission</h2>
-                    <p class="text-gray-600 leading-relaxed">
-                        Our mission is to make travel planning a breeze for everyone. We strive to offer comprehensive travel information,
-                        personalized recommendations, and secure booking solutions.
-                    </p>
-                </div>
-
-                <div class="transform hover:scale-105 transition-transform duration-300 bg-white rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Contact Us</h2>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-                            <div class="bg-amber-100 p-3 rounded-full">
-                                <i class="fa-solid fa-phone text-amber-600"></i>
+                <!-- Welcome Card -->
+                <article class="group relative bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-br from-amber-100/20 to-transparent rounded-2xl"></div>
+                    <div class="relative">
+                        <div class="mb-6 flex items-center gap-4">
+                            <div class="p-3 bg-amber-100 rounded-lg">
+                                <i class="fa-solid fa-compass text-3xl text-amber-600"></i>
                             </div>
-                            <p class="text-gray-600">
-                                Contact us at
-                                <span class="font-bold text-gray-800 block">+977 9876543210, +977 01-23456</span>
-                            </p>
+                            <h2 class="text-4xl font-bold text-gray-800">Our Journey</h2>
                         </div>
-                        
-                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-                            <div class="bg-amber-100 p-3 rounded-full">
-                                <i class="fa-solid fa-location-dot text-amber-600"></i>
+                        <p class="text-lg text-gray-600 leading-relaxed">
+                            {% lorem 2 b random %}
+                        </p>
+                    </div>
+                </article>
+
+                <!-- Mission Card -->
+                <article class="group relative bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-bl from-amber-100/20 to-transparent rounded-2xl"></div>
+                    <div class="relative">
+                        <div class="mb-6 flex items-center gap-4">
+                            <div class="p-3 bg-amber-100 rounded-lg">
+                                <i class="fa-solid fa-mountain-sun text-3xl text-amber-600"></i>
                             </div>
-                            <p class="text-gray-600">
-                                Visit us at
-                                <span class="font-bold text-gray-800 block">Kathmandu, Nepal</span>
-                            </p>
+                            <h2 class="text-4xl font-bold text-gray-800">Why Choose Us?</h2>
                         </div>
-                        
-                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-                            <div class="bg-amber-100 p-3 rounded-full">
-                                <i class="fa-solid fa-envelope text-amber-600"></i>
+                        <div class="grid gap-6 md:grid-cols-2">
+                            <div class="p-4 bg-amber-50 rounded-xl">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">Local Expertise</h3>
+                                <p class="text-gray-600">15+ years navigating Nepal's hidden gems</p>
                             </div>
-                            <p class="text-gray-600">
-                                Email us at
-                                <span class="font-bold text-gray-800 block">gantavya@gmail.com</span>
-                            </p>
+                            <div class="p-4 bg-amber-50 rounded-xl">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">Sustainable Travel</h3>
+                                <p class="text-gray-600">Certified eco-friendly tourism practices</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Contact Card -->
+                <article class="group relative bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                    <div class="relative">
+                        <div class="mb-6 flex items-center gap-4">
+                            <div class="p-3 bg-amber-100 rounded-lg">
+                                <i class="fa-solid fa-headset text-3xl text-amber-600"></i>
+                            </div>
+                            <h2 class="text-4xl font-bold text-gray-800">Connect With Us</h2>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="p-6 bg-gradient-to-r from-amber-50 to-white rounded-xl hover:-translate-y-1 transition-transform">
+                                <div class="flex items-center gap-6">
+                                    <div class="p-4 bg-amber-100 rounded-xl">
+                                        <i class="fa-solid fa-map-marker-alt text-2xl text-amber-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-gray-800">Visit Our Office</h3>
+                                        <p class="text-gray-600 mt-1">Kathmandu<br>Nepal</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6 bg-gradient-to-r from-amber-50 to-white rounded-xl hover:-translate-y-1 transition-transform">
+                                <div class="flex items-center gap-6">
+                                    <div class="p-4 bg-amber-100 rounded-xl">
+                                        <i class="fa-solid fa-envelope-open-text text-2xl text-amber-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-gray-800">Email Us</h3>
+                                        <p class="text-gray-600 mt-1">contact@gantavya.com<br>support@gantavya.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Right Column -->
+            <div class="lg:col-span-2">
+                <div class="sticky top-8 space-y-8">
+                    <div class="overflow-hidden rounded-2xl shadow-xl group">
+                        <img 
+                            src="{% static 'assets/images/about2.png' %}"
+                            class="w-full h-auto object-cover transform transition-all duration-500 group-hover:scale-105"
+                            alt="Our Team in Nepal"
+                            loading="lazy"
+                        >
+                    </div>
+                    
+                    <!-- Achievement Badges -->
+                    <div class="bg-amber-50 rounded-2xl p-6 space-y-4">
+                        <div class="text-center">
+                            <p class="text-5xl font-bold text-amber-600">15K+</p>
+                            <p class="text-gray-600 mt-1">Happy Travelers</p>
+                        </div>
+                        <div class="h-px bg-amber-100"></div>
+                        <div class="text-center">
+                            <p class="text-5xl font-bold text-amber-600">500+</p>
+                            <p class="text-gray-600 mt-1">Successful Expeditions</p>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="lg:col-span-2">
-                <div class="sticky top-8">
-                    <img
-                        src="{% static 'assets/images/about2.png' %}"
-                        class="w-full h-auto object-cover rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300"
-                        alt="About Gantavya"
-                        height="600"
-                        width="1200"
-                    />
-                </div>
-            </div>
         </div>
-    </div>
+    </main>
 </div>
+
+<style>
+    .animate-fade-in-down {
+        animation: fadeInDown 0.8s ease-out forwards;
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+    
+    .delay-100 {
+        animation-delay: 0.1s;
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 {% endblock content %}

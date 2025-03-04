@@ -1,6 +1,6 @@
 {% extends "includes/layout.html" %}
 {% block title %}
-    {{ package.name }} - Package
+    {{ activity.name }} - Activity
 {% endblock title %}
 {% block content %}
     <!-- Booking Modal -->
@@ -8,10 +8,10 @@
         <div class="bg-white rounded-2xl w-full max-w-md transform transition-all duration-300 scale-95 opacity-0"
              id="modalContent">
             <div class="relative overflow-hidden">
-                <img id="modalPackageImage"
+                <img id="modalActivityImage"
                      class="w-full h-52 object-cover rounded-t-2xl"
                      src=""
-                     alt="Package Image"
+                     alt="Activity Image"
                      loading="lazy">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <button onclick="closeBookingModal()"
@@ -19,25 +19,25 @@
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
-            <form method="post" action="{% url 'book_package' %}" class="p-6 space-y-6">
+            <form method="post" action="{% url 'book_activity' %}" class="p-6 space-y-6">
                 {% csrf_token %}
-                <input type="hidden" name="package_id" id="packageId">
+                <input type="hidden" name="activity_id" id="activityId">
                 
-                <!-- Package Details -->
+                <!-- Activity Details -->
                 <div class="space-y-4">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h4 id="modalPackageName" class="text-2xl font-bold text-gray-900"></h4>
-                            <p id="modalPackageDescription" class="text-gray-600 mt-1 text-sm"></p>
+                            <h4 id="modalActivityName" class="text-2xl font-bold text-gray-900"></h4>
+                            <p id="modalActivityDescription" class="text-gray-600 mt-1 text-sm"></p>
                         </div>
-                        <span id="modalPackagePrice"
+                        <span id="modalActivityPrice"
                               class="px-4 py-1.5 bg-amber-100 text-amber-800 text-lg font-semibold rounded-full">
                         </span>
                     </div>
                     
                     <!-- Date Picker -->
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <label class="block text-sm font-medium text-gray-700">Select Date</label>
                         <div class="relative">
                             <input type="date"
                                    name="start_date"
@@ -71,21 +71,21 @@
         <!-- Image Header -->
         <div class="relative group rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300">
             <img class="h-64 w-full object-cover md:h-[480px] transition-transform duration-300 group-hover:scale-105"
-                 src="{{ package.image.url }}"
-                 alt="{{ package.name }}"
+                 src="{{ activity.image.url }}"
+                 alt="{{ activity.name }}"
                  loading="lazy">
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             <div class="absolute bottom-6 left-6 right-6">
                 <div class="flex justify-between items-end">
                     <div class="space-y-2">
-                        <h1 class="text-4xl font-bold text-white">{{ package.name }}</h1>
+                        <h1 class="text-4xl font-bold text-white">{{ activity.name }}</h1>
                         <div class="flex items-center gap-2 text-amber-100">
                             <i class="fa-solid fa-location-dot"></i>
-                            <span class="font-medium">{{ package.location }}</span>
+                            <span class="font-medium">{{ activity.location }}</span>
                         </div>
                     </div>
                     <button class="favourite-button flex items-center justify-center w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full hover:bg-red-50 hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl"
-                            onclick="toggleFavourite(event, {{ package.id }}, this)"
+                            onclick="toggleFavourite(event, {{ activity.id }}, this)"
                             aria-label="Add to Favorites">
                         <i class="text-xl {% if is_favourite %}fa-solid fa-heart text-red-500{% else %}fa-regular fa-heart text-gray-600{% endif %}"></i>
                     </button>
@@ -101,20 +101,20 @@
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex items-center gap-4">
                         <div class="p-3 bg-amber-100 rounded-xl">
-                            <i class="fa-solid fa-suitcase-rolling text-2xl text-amber-600"></i>
+                            <i class="fa-solid fa-tag text-2xl text-amber-600"></i>
                         </div>
                         <div>
                             <h3 class="text-sm font-semibold text-gray-500 mb-1">STARTING FROM</h3>
-                            <p class="text-3xl font-bold text-gray-900">Rs.{{ package.price }}</p>
+                            <p class="text-3xl font-bold text-gray-900">Rs.{{ activity.price }}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Description -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
-                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">Package Details</h3>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">About This Activity</h3>
                     <div class="prose max-w-none text-gray-600">
-                        {{ package.description|linebreaks }}
+                        {{ activity.description|linebreaks }}
                     </div>
                 </div>
             </div>
@@ -123,17 +123,17 @@
             <div class="bg-white rounded-2xl shadow-xl p-6 h-fit sticky top-6">
                 <div class="space-y-6">
                     <div class="text-center">
-                        <p class="text-lg font-semibold text-gray-600">Ready to Travel?</p>
-                        <p class="text-3xl font-bold text-gray-900 mt-2">Rs.{{ package.price }}</p>
+                        <p class="text-lg font-semibold text-gray-600">Ready for Adventure?</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">Rs.{{ activity.price }}</p>
                         <p class="text-sm text-gray-500 mt-2">per person</p>
                     </div>
                     <button onclick="showBookingModal(this)"
                             class="w-full px-6 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-xl transition-all flex items-center justify-center gap-3"
-                            data-package-id="{{ package.id }}"
-                            data-package-name="{{ package.name }}"
-                            data-package-price="Rs.{{ package.price }}"
-                            data-package-description="{{ package.description }}"
-                            data-package-image="{{ package.image.url }}">
+                            data-activity-id="{{ activity.id }}"
+                            data-activity-name="{{ activity.name }}"
+                            data-activity-price="Rs.{{ activity.price }}"
+                            data-activity-description="{{ activity.description }}"
+                            data-activity-image="{{ activity.image.url }}">
                         <i class="fa-solid fa-calendar-check"></i>
                         Book Now
                     </button>
@@ -144,14 +144,14 @@
                             <i class="fa-solid fa-clock text-amber-600"></i>
                             <div>
                                 <p class="text-sm font-semibold text-gray-600">Duration</p>
-                                <p class="text-gray-900">{{ package.duration }} days</p>
+                                <p class="text-gray-900">4-6 hours</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                            <i class="fa-solid fa-hotel text-amber-600"></i>
+                            <i class="fa-solid fa-user-group text-amber-600"></i>
                             <div>
-                                <p class="text-sm font-semibold text-gray-600">Accommodation</p>
-                                <p class="text-gray-900">{{ package.accommodation_type }}</p>
+                                <p class="text-sm font-semibold text-gray-600">Group Size</p>
+                                <p class="text-gray-900">2-12 people</p>
                             </div>
                         </div>
                     </div>
@@ -162,19 +162,19 @@
         <!-- Navigation -->
         <div class="flex justify-between items-center mt-12">
             <div class="flex gap-3">
-                {% if prev_package_id %}
-                    <a href="{% url 'package_detail' id=prev_package_id %}"
+                {% if prev_activity_id %}
+                    <a href="{% url 'activity_detail' id=prev_activity_id %}"
                        class="px-5 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-amber-50 transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-chevron-left text-amber-600"></i>
-                        Previous Package
+                        Previous Activity
                     </a>
                 {% endif %}
             </div>
             <div class="flex gap-3">
-                {% if next_package_id %}
-                    <a href="{% url 'package_detail' id=next_package_id %}"
+                {% if next_activity_id %}
+                    <a href="{% url 'activity_detail' id=next_activity_id %}"
                        class="px-5 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-amber-50 transition-colors flex items-center gap-2">
-                        Next Package
+                        Next Activity
                         <i class="fa-solid fa-chevron-right text-amber-600"></i>
                     </a>
                 {% endif %}
@@ -185,12 +185,12 @@
     <!-- CTA Section -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 mb-24">
         <div class="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-8 text-center shadow-xl">
-            <h3 class="text-2xl font-bold text-white mb-3">More Amazing Packages!</h3>
-            <p class="text-amber-100 mb-6">Discover our collection of curated travel experiences</p>
-            <a href="{% url 'packages_list' %}"
+            <h3 class="text-2xl font-bold text-white mb-3">More Adventures Await!</h3>
+            <p class="text-amber-100 mb-6">Explore our curated selection of exciting activities</p>
+            <a href="{% url 'activities_list' %}"
                class="inline-flex items-center justify-center px-8 py-3 bg-white text-amber-600 rounded-lg font-semibold hover:bg-gray-50 transition-all gap-2">
-                <i class="fa-solid fa-globe"></i>
-                Browse All Packages
+                <i class="fa-solid fa-rotate-right"></i>
+                Browse All Activities
             </a>
         </div>
     </div>
@@ -199,20 +199,20 @@
 {% block javascript %}
     <script>
     function showBookingModal(button) {
-        const packageData = {
-            id: button.dataset.packageId,
-            name: button.dataset.packageName,
-            price: button.dataset.packagePrice,
-            description: button.dataset.packageDescription,
-            image: button.dataset.packageImage
+        const activityData = {
+            id: button.dataset.activityId,
+            name: button.dataset.activityName,
+            price: button.dataset.activityPrice,
+            description: button.dataset.activityDescription,
+            image: button.dataset.activityImage
         };
 
         // Update modal content
-        document.getElementById('packageId').value = packageData.id;
-        document.getElementById('modalPackageImage').src = packageData.image;
-        document.getElementById('modalPackageName').textContent = packageData.name;
-        document.getElementById('modalPackagePrice').textContent = packageData.price;
-        document.getElementById('modalPackageDescription').textContent = packageData.description;
+        document.getElementById('activityId').value = activityData.id;
+        document.getElementById('modalActivityImage').src = activityData.image;
+        document.getElementById('modalActivityName').textContent = activityData.name;
+        document.getElementById('modalActivityPrice').textContent = activityData.price;
+        document.getElementById('modalActivityDescription').textContent = activityData.description;
 
         // Show modal with animation
         const modal = document.getElementById('bookingModal');
