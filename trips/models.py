@@ -56,6 +56,9 @@ class BookingBaseModel(BaseModel):
         PaymentHistory, on_delete=models.CASCADE, null=True, blank=True
     )
 
+    def get_booking_type():
+        return ""
+
     class Meta:
         abstract = True
         ordering = ("-start_date",)
@@ -209,6 +212,13 @@ class TripBooking(BookingBaseModel):
     def __str__(self):
         return f"{self.trip.destination.name} booking by {self.user.email}"
 
+    @classmethod
+    def get_booking_type(cls):
+        return "Trip"
+
+    def get_booked_instance(self):
+        return self.trip
+
 
 class ActivityBooking(BookingBaseModel):
     activity = models.ForeignKey(
@@ -218,6 +228,13 @@ class ActivityBooking(BookingBaseModel):
     def __str__(self):
         return f"{self.activity.name} booking by {self.user.email}"
 
+    @classmethod
+    def get_booking_type(cls):
+        return "Activity"
+
+    def get_booked_instance(self):
+        return self.activity
+
 
 class HotelBooking(BookingBaseModel):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name="bookings")
@@ -225,6 +242,13 @@ class HotelBooking(BookingBaseModel):
 
     def __str__(self):
         return f"{self.hotel.name} booking by {self.user.email}"
+
+    @classmethod
+    def get_booking_type(cls):
+        return "Hotel"
+
+    def get_booked_instance(self):
+        return self.hotel
 
 
 class PackageBooking(BookingBaseModel):
@@ -234,6 +258,13 @@ class PackageBooking(BookingBaseModel):
 
     def __str__(self):
         return f"{self.package.name} booking by {self.user.email}"
+
+    @classmethod
+    def get_booking_type(cls):
+        return "Package"
+
+    def get_booked_instance(self):
+        return self.package
 
 
 class FavouriteTrip(FavouriteBaseModel):

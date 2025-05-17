@@ -16,52 +16,28 @@
         <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
             <!-- Hero Section -->
             <div class="relative">
-                {% if booking.booking_type == 'trip' %}
-                    <img src="{{ booking.trip.destination.image.url }}"
-                         alt="{{ booking.trip.destination.name }}"
-                         class="w-full h-64 object-cover md:h-96">
-                {% elif booking.booking_type == 'activity' %}
-                    <img src="{{ booking.activity.image.url }}"
-                         alt="{{ booking.activity.name }}"
-                         class="w-full h-64 object-cover md:h-96">
-                {% elif booking.booking_type == 'package' %}
-                    <img src="{{ booking.package.image.url }}"
-                         alt="{{ booking.package.name }}"
-                         class="w-full h-64 object-cover md:h-96">
-                {% elif booking.booking_type == 'hotel' %}
-                    <img src="{{ booking.hotel.image.url }}"
-                         alt="{{ booking.hotel.name }}"
-                         class="w-full h-64 object-cover md:h-96">
-                {% endif %}
+                <img src="{{ booking.get_booked_instance.image.url }}"
+                     alt="{{ booking.get_booked_instance.name }}"
+                     width="800"
+                     height="400"
+                     class="w-full h-64 object-cover md:h-96">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                 <div class="absolute bottom-6 left-6 right-6">
                     <div class="flex items-end justify-between">
                         <div>
-                            <h1 class="text-4xl font-bold text-white aboreto-regular mb-2">
-                                {% if booking.booking_type == 'trip' %}
-                                    {{ booking.trip.name }}
-                                {% elif booking.booking_type == 'activity' %}
-                                    {{ booking.activity.name }}
-                                {% elif booking.booking_type == 'package' %}
-                                    {{ booking.package.name }}
-                                {% elif booking.booking_type == 'hotel' %}
-                                    {{ booking.hotel.name }}
-                                {% endif %}
-                            </h1>
+                            <h1 class="text-4xl font-bold text-white aboreto-regular mb-2">{{ booking.get_booked_instance.name }}</h1>
                             <p class="text-lg text-amber-100 aboreto-regular">
-                                {% if booking.booking_type == 'trip' %}
-                                    {{ booking.trip.destination.name }}
-                                {% elif booking.booking_type == 'activity' %}
-                                    {{ booking.activity.location }}
-                                {% elif booking.booking_type == 'package' %}
-                                    {{ booking.package.destination.name }}
-                                {% elif booking.booking_type == 'hotel' %}
-                                    {{ booking.hotel.location }}
+                                {% if booking.get_booking_type|lower == 'trip' or booking.get_booking_type|lower == 'package' %}
+                                    {{ booking.get_booked_instance.destination.name }}
+                                {% elif booking.get_booking_type|lower == 'hotel' %}
+                                    {{ booking.get_booked_instance.city }}
+                                {% else %}
+                                    {{ booking.get_booked_instance.location }}
                                 {% endif %}
                             </p>
                         </div>
                         <div class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                            <span class="text-lg font-semibold text-amber-600 aboreto-regular">Rs. {{ booking.total_price }}</span>
+                            <span class="text-lg font-semibold text-amber-600 aboreto-regular">Rs. {{ booking.get_booked_instance.price }}</span>
                         </div>
                     </div>
                 </div>
@@ -74,11 +50,11 @@
                     <div class="p-6 bg-gray-50 rounded-xl border border-gray-100">
                         <div class="flex items-center gap-4">
                             <div class="p-3 bg-amber-100 rounded-lg">
-                                <i class="{% if booking.booking_type == 'trip' %}fa-solid fa-map-marked {% elif booking.booking_type == 'package' %}fa-solid fa-gift {% elif booking.booking_type == 'hotel' %}fa-solid fa-hotel {% else %}fa-solid fa-ticket{% endif %} text-2xl text-amber-600"></i>
+                                <i class="{% if booking.get_booking_type|lower == 'trip' %}fa-solid fa-map-marked {% elif booking.get_booking_type|lower == 'package' %}fa-solid fa-gift {% elif booking.get_booking_type|lower == 'hotel' %}fa-solid fa-hotel {% else %}fa-solid fa-ticket{% endif %} text-2xl text-amber-600"></i>
                             </div>
                             <div>
                                 <h3 class="text-xl font-semibold text-gray-800 aboreto-regular">Booking Type</h3>
-                                <p class="text-gray-600">{{ booking.get_booking_type_display }}</p>
+                                <p class="text-gray-600">{{ booking.get_booking_type }}</p>
                             </div>
                         </div>
                     </div>
@@ -86,7 +62,7 @@
                     <div class="p-6 bg-gray-50 rounded-xl border border-gray-100 space-y-4">
                         <div class="flex items-center gap-4">
                             <div class="p-3 bg-amber-100 rounded-lg">
-                                <i class="fa-solid fa-calendar-star text-2xl text-amber-600"></i>
+                                <i class="fa-solid fa-calendar text-2xl text-amber-600"></i>
                             </div>
                             <div>
                                 <h3 class="text-xl font-semibold text-gray-800 aboreto-regular">Dates</h3>
@@ -97,7 +73,7 @@
                                     </p>
                                     <p class="text-gray-600">
                                         <span class="font-medium">Travel Dates:</span>
-                                        {% if booking.booking_type == 'hotel' %}
+                                        {% if booking.get_booking_type|lower == 'hotel' %}
                                             {{ booking.start_date|date:"M d, Y" }} - {{ booking.to_date|date:"M d, Y" }}
                                         {% else %}
                                             {{ booking.start_date|date:"M d, Y" }}
@@ -108,7 +84,7 @@
                         </div>
                     </div>
                     <!-- Duration Card -->
-                    {% if booking.booking_type != 'hotel' %}
+                    {% if booking.get_booking_type|lower != 'hotel' %}
                         <div class="p-6 bg-gray-50 rounded-xl border border-gray-100">
                             <div class="flex items-center gap-4">
                                 <div class="p-3 bg-amber-100 rounded-lg">
@@ -117,12 +93,12 @@
                                 <div>
                                     <h3 class="text-xl font-semibold text-gray-800 aboreto-regular">Duration</h3>
                                     <p class="text-gray-600">
-                                        {% if booking.booking_type == 'trip' %}
-                                            {{ booking.trip.duration }} Days
-                                        {% elif booking.booking_type == 'package' %}
-                                            {{ booking.package.duration }} Days
-                                        {% elif booking.booking_type == 'activity' %}
-                                            {{ booking.activity.duration }} Hours
+                                        {% if booking.get_booking_type|lower == 'trip' %}
+                                            {{ booking.get_booked_instance.travelling_days }} Days
+                                        {% elif booking.get_booking_type|lower == 'activity' %}
+                                            {{ booking.get_booked_instance.duration }} Hours
+                                        {% elif booking.get_booking_type|lower == 'package' %}
+                                            {{ booking.get_booked_instance.duration }} Days
                                         {% endif %}
                                     </p>
                                 </div>
@@ -141,14 +117,10 @@
                             <div>
                                 <h3 class="text-xl font-semibold text-gray-800 aboreto-regular">Location Details</h3>
                                 <p class="text-gray-600 mt-2">
-                                    {% if booking.booking_type == 'trip' %}
-                                        {{ booking.trip.destination.description|truncatechars:200 }}
-                                    {% elif booking.booking_type == 'activity' %}
-                                        {{ booking.activity.location_description }}
-                                    {% elif booking.booking_type == 'package' %}
-                                        {{ booking.package.destination.description|truncatechars:200 }}
-                                    {% elif booking.booking_type == 'hotel' %}
-                                        {{ booking.hotel.address }}
+                                    {% if booking.booking_type == 'hotel' %}
+                                        {{ booking.get_booked_instance.address }}
+                                    {% else %}
+                                        {{ booking.get_booked_instance.description|truncatechars:200 }}
                                     {% endif %}
                                 </p>
                                 <div class="mt-4">

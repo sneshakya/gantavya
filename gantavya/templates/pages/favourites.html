@@ -1,0 +1,245 @@
+{% extends "includes/layout/homepage.html" %}
+{% block title %}
+    Favourites
+{% endblock title %}
+{% block inner_content %}
+    <div class="mx-4 sm:mx-8 lg:mx-16 xl:mx-32 mb-16">
+        <h1 class="text-4xl font-bold text-gray-900 mb-10 mt-8 text-center">Your Favourite Journeys</h1>
+        {% if fav_destinations or fav_trips or fav_activities or fav_packages or fav_hotels %}
+            <!-- Destinations Section -->
+            {% if fav_destinations %}
+                <section class="mb-16">
+                    <div class="flex items-center mb-8 border-b-2 border-gray-200 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">Destinations</h2>
+                        <svg class="w-6 h-6 text-blue-600 ml-3"
+                             fill="currentColor"
+                             viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {% for item in fav_destinations %}
+                            <div class="group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="h-48 bg-gray-200 rounded-t-xl overflow-hidden">
+                                    <img src="{{ item.destination.image.url }}"
+                                         alt="{{ item.destination.name }}"
+                                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ item.destination.name }}</h3>
+                                    <p class="text-gray-600 text-sm mb-4">{{ item.destination.description|truncatechars:100 }}</p>
+                                    <div class="flex justify-between items-center mt-4">
+                                        <a href="/destinations/{{ item.destination.id }}"
+                                           class="text-blue-600 hover:text-blue-700 font-medium">View Details →</a>
+                                        <button onclick="toggleFavourite(event, '{{ item.destination.id }}', this, 'destination')"
+                                                class="text-red-500 hover:text-red-600">
+                                            <i class="fas fa-heart text-xl"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+            <!-- Trips Section -->
+            {% if fav_trips %}
+                <section class="mb-16">
+                    <div class="flex items-center mb-8 border-b-2 border-gray-200 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">Trips</h2>
+                        <svg class="w-6 h-6 text-blue-600 ml-3"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {% for item in fav_trips %}
+                            <div class="group bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h3 class="text-xl font-semibold text-gray-900">{{ item.trip.name }}</h3>
+                                        <button onclick="toggleFavourite(event, '{{ item.trip.id }}', this, 'trip')"
+                                                class="text-red-500 hover:text-red-600">
+                                            <i class="fas fa-heart text-xl"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-gray-600 text-sm mb-4">{{ item.trip.description|truncatechars:120 }}</p>
+                                    <div class="flex justify-between items-center mt-4">
+                                        <a href="/trips/{{ item.trip.id }}"
+                                           class="text-blue-600 hover:text-blue-700 font-medium">View Details →</a>
+                                        <div class="flex items-center text-sm text-blue-600 font-medium">
+                                            <span class="mr-2">{{ item.trip.rating }}</span>
+                                            <span>{{ item.trip.price }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+            <!-- Activities Section -->
+            {% if fav_activities %}
+                <section class="mb-16">
+                    <div class="flex items-center mb-8 border-b-2 border-gray-200 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">Activities</h2>
+                        <svg class="w-6 h-6 text-blue-600 ml-3"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {% for item in fav_activities %}
+                            <div class="group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="h-48 bg-gray-200 rounded-t-xl overflow-hidden">
+                                    <img src="{{ item.activity.image.url }}"
+                                         alt="{{ item.activity.name }}"
+                                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ item.activity.name }}</h3>
+                                    <p class="text-gray-600 text-sm mb-4">{{ item.activity.description|truncatechars:100 }}</p>
+                                    <div class="flex justify-between items-center mt-4">
+                                        <a href="/activities/{{ item.activity.id }}"
+                                           class="text-blue-600 hover:text-blue-700 font-medium">View Details →</a>
+                                        <button onclick="toggleFavourite(event, '{{ item.activity.id }}', this, 'activity')"
+                                                class="text-red-500 hover:text-red-600">
+                                            <i class="fas fa-heart text-xl"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+            <!-- Packages Section -->
+            {% if fav_packages %}
+                <section class="mb-16">
+                    <div class="flex items-center mb-8 border-b-2 border-gray-200 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">Packages</h2>
+                        <svg class="w-6 h-6 text-blue-600 ml-3"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {% for item in fav_packages %}
+                            <div class="group bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h3 class="text-xl font-semibold text-gray-900">{{ item.package.name }}</h3>
+                                        <button onclick="toggleFavourite(event, '{{ item.package.id }}', this, 'package')"
+                                                class="text-red-500 hover:text-red-600">
+                                            <i class="fas fa-heart text-xl"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-gray-600 text-sm mb-4">{{ item.package.description|truncatechars:120 }}</p>
+                                    <div class="mt-4">
+                                        <a href="/packages/{{ item.package.id }}"
+                                           class="text-blue-600 hover:text-blue-700 font-medium">View Details →</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+            <!-- Hotels Section -->
+            {% if fav_hotels %}
+                <section class="mb-16">
+                    <div class="flex items-center mb-8 border-b-2 border-gray-200 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">Hotels</h2>
+                        <svg class="w-6 h-6 text-blue-600 ml-3"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {% for item in fav_hotels %}
+                            <div class="group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="h-48 bg-gray-200 rounded-t-xl overflow-hidden">
+                                    <img src="{{ item.hotel.image.url }}"
+                                         alt="{{ item.hotel.name }}"
+                                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ item.hotel.name }}</h3>
+                                    <p class="text-gray-600 text-sm mb-4">{{ item.hotel.description|truncatechars:100 }}</p>
+                                    <div class="mt-4">
+                                        <a href="/hotels/{{ item.hotel.id }}"
+                                           class="text-blue-600 hover:text-blue-700 font-medium">View Details →</a>
+                                    </div>
+                                    <button onclick="toggleFavourite(event, '{{ item.hotel.id }}', this, 'hotel')"
+                                            class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm hover:bg-red-50 transition-colors duration-200">
+                                        <i class="fas fa-heart text-red-500 hover:text-red-600 text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-24">
+                <div class="max-w-md mx-auto">
+                    <svg class="w-24 h-24 mx-auto text-gray-400 mb-6"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">No Favourites Yet</h3>
+                    <p class="text-gray-600 mb-8">Start exploring amazing experiences and add them to your collection!</p>
+                    <a href="/explore"
+                       class="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 transform hover:-translate-y-1 hover:shadow-lg">
+                        Discover Now →
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock inner_content %}
+{% block javascript %}
+    <script>
+    function toggleFavourite(event, id, button, context) {
+        event.preventDefault();
+        const icon = button.children[0];
+        
+        // Add bounce animation
+        icon.classList.add('animate-bounce');
+        setTimeout(() => icon.classList.remove('animate-bounce'), 300);
+
+        fetch(`/add-to-favourites/?id=${id}&context=${context}`)
+            .then(response => {
+                if (response.ok) {
+                    // Remove parent card with fade-out animation
+                    const card = button.closest('.group');
+                    card.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                    setTimeout(() => {
+                        card.remove();
+                        // Reload if last item in section
+                        if (!document.querySelector('[data-favourite-section]')) {
+                            window.location.reload();
+                        }
+                    }, 300);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                icon.classList.remove('text-red-500');
+                icon.classList.add('text-gray-600');
+            });
+    }
+    </script>
+{% endblock javascript %}

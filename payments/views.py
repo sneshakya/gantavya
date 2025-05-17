@@ -8,7 +8,9 @@ from datetime import datetime
 
 from django.shortcuts import redirect, render
 from django.core.cache import cache
+from django.views.decorators.csrf import csrf_exempt
 
+from accounts.models import CustomUser
 from payments.models import PaymentHistory
 from trips.models import Hotel
 from trips.views import add_booking
@@ -35,6 +37,7 @@ def generate_signature(msg):
     return signature
 
 
+@csrf_exempt
 def pay_with_esewa(request):
     if request.method == "POST":
         cache_data = cache.get("booking")
@@ -83,6 +86,7 @@ def pay_with_esewa(request):
     return render(request, "500.html")
 
 
+@csrf_exempt
 def pay_with_khalti(request):
     if request.method == "POST":
         cache_data = cache.get("booking")
@@ -114,7 +118,7 @@ def pay_with_khalti(request):
             "website_url": "http://localhost:8000",
             "amount": round(total_amount * 100),
             "purchase_order_id": purchase_id,
-            "purchase_order_name": product.product_code,
+            "purchase_order_name": product.name,
             "customer_info": customer_info,
             "amount_breakdown": [
                 {"label": "Mark Price", "amount": round(total_amount * 100)},
@@ -140,6 +144,7 @@ def pay_with_khalti(request):
     return render(request, "500.html")
 
 
+@csrf_exempt
 def verify_esewa(request):
     if request.method == "GET":
         encoded_data = request.GET.get("data", None)
@@ -152,25 +157,26 @@ def verify_esewa(request):
                 transaction_id = decoded_data["transaction_uuid"]
                 total_amount = decoded_data["total_amount"].replace(",", "")
 
-                try:
-                    # Save the transaction to the database
-                    payment_history = PaymentHistory(
-                        transaction_id=transaction_id,
-                        user=request.user,
-                        total_payment=total_amount,
-                        payment_via=PaymentHistory.PaymentMethod.ESEWA,
-                    )
-                    payment_history.save()
+                cache_data = cache.get("booking")
+                user = CustomUser.objects.get(id=cache_data.get("user_id"))
 
-                    add_booking(request.user, payment_history.transaction_id)
+                # Save the transaction to the database
+                payment_history = PaymentHistory(
+                    transaction_id=transaction_id,
+                    user=user,
+                    total_payment=total_amount,
+                    payment_via=PaymentHistory.PaymentMethod.ESEWA,
+                )
+                payment_history.save()
 
-                    return redirect("payment_success")
-                except:
-                    return render(request, "500.html")
+                add_booking(user, payment_history)
+
+                return redirect("payment_success")
 
     return redirect("payment_failure")
 
 
+@csrf_exempt
 def verify_khalti(request):
     if request.method == "GET":
         status = request.GET.get("status", "Failed")
@@ -183,19 +189,20 @@ def verify_khalti(request):
             purchase_order_id = request.GET.get("purchase_order_id")
             purchase_order_name = request.GET.get("purchase_order_name")
 
-            try:
-                # Save the transaction to the database
-                PaymentHistory.objects.create(
-                    transaction_id=transaction_id,
-                    user=request.user,
-                    total_payment=total_amount,
-                    payment_via=PaymentHistory.PaymentMethod.KHALTI,
-                )
+            cache_data = cache.get("booking")
+            user = CustomUser.objects.get(id=cache_data.get("user_id"))
 
-                add_booking(request.user)
+            # Save the transaction to the database
+            payment_history = PaymentHistory(
+                transaction_id=transaction_id,
+                user=user,
+                total_payment=total_amount,
+                payment_via=PaymentHistory.PaymentMethod.KHALTI,
+            )
+            payment_history.save()
 
-                return redirect("payment_success")
-            except:
-                return render(request, "500.html")
+            add_booking(user, payment_history)
+
+            return redirect("payment_success")
 
     return redirect("payment_failure")

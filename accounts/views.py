@@ -85,11 +85,12 @@ def profile_view(request):
 
         print(user.check_password(data.get("password")))
         if user.check_password(data.get("password")):
-            user.profile_picture = request.FILES.get("profile_picture")
             user.first_name = data.get("first_name")
             user.last_name = data.get("last_name")
             user.phone_number = data.get("phone_number")
             user.address = data.get("address")
+            if request.FILES.get("profile_picture"):
+                user.profile_picture = request.FILES.get("profile_picture")
             user.save()
 
             return redirect("profile")
@@ -133,4 +134,3 @@ class CustomSocialAccountSignupView(SignupView):
             form.save()
             return redirect(reverse("/"))
         return render(request, "pages/auth/socialaccount_signup.html", {"form": form})
-

@@ -1,9 +1,14 @@
+from email.mime.text import MIMEText
+import os
+import smtplib
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.forms import model_to_dict
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from datetime import date, datetime
+from datetime import date, datetime, timezone
+
+from accounts.models import CustomUser
 
 from .models import (
     ActivityBooking,
@@ -249,13 +254,38 @@ def add_to_favourites(request):
 
 
 @login_required(login_url="/login/")
+def get_favourites(request):
+    # Get all favorite types separately
+    fav_destinations = FavouriteDestination.objects.filter(user=request.user)
+    fav_trips = FavouriteTrip.objects.filter(user=request.user)
+    fav_activities = FavouriteActivity.objects.filter(user=request.user)
+    fav_packages = FavouritePackage.objects.filter(user=request.user)
+    fav_hotels = FavouriteHotel.objects.filter(user=request.user)
+
+    return render(
+        request,
+        "pages/favourites.html",
+        {
+            "fav_destinations": fav_destinations,
+            "fav_trips": fav_trips,
+            "fav_activities": fav_activities,
+            "fav_packages": fav_packages,
+            "fav_hotels": fav_hotels,
+        },
+    )
+
+
+@login_required(login_url="/login/")
 def book_trip(request):
     if request.method == "POST":
         data = request.POST
-        id = data["trip_id"][0]
+        id = data["trip_id"]
         start_date = data["start_date"]
 
-        if TripBooking.objects.filter(user=request.user, trip=id).exists():
+        existing_booking = TripBooking.objects.filter(
+            user=request.user, trip=id
+        ).first()
+        if existing_booking and existing_booking.start_date >= date.today():
             return redirect("total_booking")
 
         trip = get_object_or_404(Trip, pk=id)
@@ -267,7 +297,12 @@ def book_trip(request):
 
         cache.set(
             "booking",
-            {"type": "trip", "data": trip, "start_date": start_date},
+            {
+                "user_id": request.user.id,
+                "type": "trip",
+                "data": trip,
+                "start_date": start_date,
+            },
             timeout=60000,
         )
 
@@ -283,7 +318,10 @@ def book_activity(request):
         id = data["activity_id"][0]
         start_date = data["start_date"]
 
-        if ActivityBooking.objects.filter(user=request.user, activity=id).exists():
+        existing_booking = ActivityBooking.objects.filter(
+            user=request.user, activity=id
+        ).first()
+        if existing_booking and existing_booking.start_date >= date.today():
             return redirect("total_booking")
 
         activity = get_object_or_404(Activity, pk=id)
@@ -295,7 +333,12 @@ def book_activity(request):
 
         cache.set(
             "booking",
-            {"type": "activity", "data": activity, "start_date": start_date},
+            {
+                "user_id": request.user.id,
+                "type": "activity",
+                "data": activity,
+                "start_date": start_date,
+            },
             timeout=60000,
         )
 
@@ -311,7 +354,10 @@ def book_package(request):
         id = data["package_id"]
         start_date = data["start_date"]
 
-        if PackageBooking.objects.filter(user=request.user, package=id).exists():
+        existing_booking = PackageBooking.objects.filter(
+            user=request.user, package=id
+        ).first()
+        if existing_booking and existing_booking.start_date >= date.today():
             return redirect("total_booking")
 
         package = get_object_or_404(Package, pk=id)
@@ -323,7 +369,12 @@ def book_package(request):
 
         cache.set(
             "booking",
-            {"type": "package", "data": package, "start_date": start_date},
+            {
+                "user_id": request.user.id,
+                "type": "package",
+                "data": package,
+                "start_date": start_date,
+            },
             timeout=60000,
         )
 
@@ -340,7 +391,10 @@ def book_hotel(request):
         start_date = data["start_date"]
         to_date = data["to_date"]
 
-        if HotelBooking.objects.filter(user=request.user, hotel=id).exists():
+        existing_booking = HotelBooking.objects.filter(
+            user=request.user, hotel=id
+        ).first()
+        if existing_booking and existing_booking.to_date >= date.today():
             return redirect("total_booking")
 
         hotel = get_object_or_404(Hotel, pk=id)
@@ -358,6 +412,7 @@ def book_hotel(request):
         cache.set(
             "booking",
             {
+                "user_id": request.user.id,
                 "type": "hotel_homestay",
                 "data": hotel,
                 "start_date": start_date,
@@ -414,7 +469,18 @@ def total_booking(request):
 
 
 def booking_detail(request, id):
-    return render(request, "pages/booking-detail.html")
+    from django.shortcuts import get_object_or_404
+    from .models import TripBooking, ActivityBooking, PackageBooking, HotelBooking
+
+    # Try to find the booking in each model
+    booking = (
+        get_object_or_404(TripBooking, id=id, user=request.user)
+        or get_object_or_404(ActivityBooking, id=id, user=request.user)
+        or get_object_or_404(PackageBooking, id=id, user=request.user)
+        or get_object_or_404(HotelBooking, id=id, user=request.user)
+    )
+
+    return render(request, "pages/booking-detail.html", {"booking": booking})
 
 
 def add_booking(user, transaction_id):
@@ -424,35 +490,74 @@ def add_booking(user, transaction_id):
         type_of_booking = cache_data.get("type")
         data = cache_data.get("data")
         start_date = cache_data.get("start_date")
-
+        # Create booking based on type
         if type_of_booking == "trip":
-            TripBooking.objects.create(
+            booking = TripBooking.objects.create(
                 trip=data,
                 user=user,
                 start_date=start_date,
                 transaction_id=transaction_id,
             )
+            booking_type = "Trip"
         elif type_of_booking == "activity":
-            ActivityBooking.objects.create(
+            booking = ActivityBooking.objects.create(
                 activity=data,
                 user=user,
                 start_date=start_date,
                 transaction_id=transaction_id,
             )
+            booking_type = "Activity"
         elif type_of_booking == "package":
-            PackageBooking.objects.create(
+            booking = PackageBooking.objects.create(
                 package=data,
                 user=user,
                 start_date=start_date,
                 transaction_id=transaction_id,
             )
+            booking_type = "Package"
         elif type_of_booking == "hotel_homestay":
             to_date = cache_data["to_date"]
-
-            HotelBooking.objects.create(
+            booking = HotelBooking.objects.create(
                 hotel=data,
                 user=user,
                 to_date=to_date,
                 start_date=start_date,
                 transaction_id=transaction_id,
             )
+            booking_type = "Hotel/Homestay"
+
+        # Send confirmation email
+        try:
+            subject = f"Booking Confirmation - {booking_type}"
+
+            # Ensure start_date is properly formatted
+            formatted_date = start_date
+            if hasattr(start_date, "strftime"):
+                formatted_date = start_date.strftime("%b %d, %Y")
+            elif isinstance(start_date, str):
+                formatted_date = start_date  # or parse string date if needed
+
+            body = f"""
+            Dear {user.get_full_name()},
+            
+            Your booking for {booking_type} has been confirmed.
+            
+            Booking Details:
+            - Type: {booking_type}
+            - Start Date: {formatted_date}
+            - Transaction ID: {transaction_id}
+            
+            Thank you for choosing us!
+            """
+
+            msg = MIMEText(body)
+            msg["Subject"] = subject
+            msg["From"] = os.getenv("EMAIL_USER")
+            msg["To"] = user.email
+
+            with smtplib.SMTP(os.getenv("SMTP_SERVER"), smtplib.SMTP_PORT) as server:
+                server.starttls()
+                server.login(os.getenv("EMAIL_USER"), os.getenv("EMAIL_PASSWORD"))
+                server.send_message(msg)
+        except Exception as e:
+            print(f"Failed to send email: {e}")

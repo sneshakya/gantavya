@@ -6,135 +6,154 @@
     <div class="mt-8 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl mb-16">
         <!-- Upcoming Bookings -->
         <div class="mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-8 aboreto-regular tracking-tighter">Upcoming Journeys</h2>
-            <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+            <div class="flex items-center gap-4 mb-8 border-b border-gray-100 pb-6">
+                <h2 class="text-3xl font-bold text-gray-900 aboreto-regular tracking-tighter">Upcoming Journeys</h2>
+                <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium">{{ upcoming_bookings|length }} Adventures</span>
+            </div>
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
                 {% for booking in upcoming_bookings %}
-                    <div class="group flex items-center gap-6 p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-300">
-                        <div class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
-                            {% if booking.booking_type == 'trip' %}
-                                <img src="{{ booking.trip.destination.image.url }}"
-                                     alt="{{ booking.trip.destination.name }}"
-                                     class="w-full h-full object-cover">
-                            {% elif booking.booking_type == 'activity' %}
-                                <img src="{{ booking.activity.image.url }}"
-                                     alt="{{ booking.activity.name }}"
-                                     class="w-full h-full object-cover">
-                            {% elif booking.booking_type == 'package' %}
-                                <img src="{{ booking.package.image.url }}"
-                                     alt="{{ booking.package.name }}"
-                                     class="w-full h-full object-cover">
-                            {% elif booking.booking_type == 'hotel' %}
-                                <img src="{{ booking.hotel.image.url }}"
-                                     alt="{{ booking.hotel.name }}"
-                                     class="w-full h-full object-cover">
-                            {% endif %}
-
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-lg font-semibold text-gray-900 truncate aboreto-regular">
-                                {% if booking.booking_type == 'trip' %}
-                                    {{ booking.trip.name }}
-                                {% elif booking.booking_type == 'activity' %}
-                                    {{ booking.activity.name }}
-                                {% elif booking.booking_type == 'package' %}
-                                    {{ booking.package.name }}
-                                {% elif booking.booking_type == 'hotel' %}
-                                    {{ booking.hotel.name }}
-                                {% endif %}
-                            </h3>
-                            <div class="flex items-center gap-4 mt-2">
-                                <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
-                                    <i class="fa-regular fa-calendar text-amber-600"></i>
-                                    <span>
-                                        {% if booking.booking_type == 'hotel' %}
-                                            {{ booking.start_date|date:"M d, Y" }} - {{ booking.to_date|date:"M d, Y" }}
-                                        {% else %}
-                                            {{ booking.start_date|date:"M d, Y" }}
-                                        {% endif %}
-                                    </span>
-                                </div>
-                                <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
-                                    <i class="fa-solid fa-tag text-amber-600"></i>
-                                    <span>Rs. {{ booking.price }}</span>
-                                </div>
-                                <div class="inline-flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full {% if booking.booking_type == 'trip' %}bg-amber-100 text-amber-800 {% elif booking.booking_type == 'package' %}bg-purple-100 text-purple-800 {% elif booking.booking_type == 'hotel' %}bg-blue-100 text-blue-800 {% else %}bg-green-100 text-green-800{% endif %}">
-                                    <i class="fas {% if booking.booking_type == 'trip' %}fa-map-marker-alt {% elif booking.booking_type == 'package' %}fa-gift {% elif booking.booking_type == 'hotel' %}fa-hotel {% else %}fa-ticket{% endif %} text-xs"></i>
-                                    <span class="aboreto-regular">{{ booking.get_booking_type_display }}</span>
+                    <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                        <div class="flex items-center gap-6 p-6">
+                            <!-- Image Container -->
+                            <div class="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden relative">
+                                <img src="{{ booking.get_booked_instance.image.url }}"
+                                     alt="{{ booking.get_booked_instance.name }}"
+                                     class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+                                <div class="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium text-gray-700 shadow-sm">
+                                    {{ booking.get_booking_type_display }}
                                 </div>
                             </div>
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0 space-y-3">
+                                <h3 class="text-xl font-semibold text-gray-900 truncate aboreto-regular">{{ booking.get_booked_instance.name }}</h3>
+                                <div class="flex flex-wrap items-center gap-4">
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <i class="fa-regular fa-calendar-days text-amber-600"></i>
+                                        <span class="font-medium">
+                                            {% if booking.booking_type == 'hotel' %}
+                                                {{ booking.start_date|date:"M d" }} - {{ booking.to_date|date:"M d, Y" }}
+                                            {% else %}
+                                                {{ booking.start_date|date:"M d, Y" }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <i class="fa-solid fa-indian-rupee-sign text-amber-600"></i>
+                                        <span class="font-medium">Rs. {{ booking.get_booked_instance.price }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <i class="fa-solid fa-user-group text-amber-600"></i>
+                                        <span class="font-medium">
+                                            {% if booking.get_booking_type|lower == 'hotel' %}
+                                                {{ booking.guests }} Guest{{ booking.guests|pluralize }}
+                                            {% else %}
+                                                1 Guest
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 rounded-full text-sm font-medium {% if booking.status == 'confirmed' %}bg-emerald-100 text-emerald-800 {% else %}bg-amber-100 text-amber-800{% endif %}">
+                                        Booked
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- Action Button -->
+                            <a href="{% url 'booking_detail' id=booking.id %}"
+                               class="ml-auto self-start p-3 -mr-3 rounded-lg hover:bg-gray-50 transition-colors"
+                               aria-label="View details">
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-lg hover:text-amber-600 transition-colors"></i>
+                            </a>
                         </div>
-                        <a href="{% url 'booking_detail' id=booking.id %}" class="ml-auto pr-2">
-                            <i class="fa-solid fa-chevron-right text-gray-400 text-lg hover:text-amber-600 transition-colors"></i>
-                        </a>
                     </div>
                 {% empty %}
-                    <div class="text-center py-12 space-y-4">
-                        <div class="mx-auto w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-suitcase-rolling text-3xl text-amber-600"></i>
+                    <div class="col-span-full text-center py-16 space-y-6">
+                        <div class="mx-auto w-48 h-48 bg-amber-50 rounded-full flex items-center justify-center p-8">
+                            <svg class="w-24 h-24 text-amber-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
                         </div>
-                        <p class="text-gray-600 text-lg aboreto-regular">No upcoming journeys planned</p>
+                        <div class="space-y-2">
+                            <h3 class="text-2xl font-semibold text-gray-900 aboreto-regular">No Upcoming Journeys</h3>
+                            <p class="text-gray-600 max-w-md mx-auto">Your next adventure is waiting! Start planning your perfect trip.</p>
+                        </div>
+                        <a href="{% url 'destinations_list' %}"
+                           class="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors">
+                            Explore Destination
+                            <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
                     </div>
                 {% endfor %}
             </div>
         </div>
         <!-- Past Bookings -->
         <div class="border-t border-gray-100 pt-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-8 aboreto-regular tracking-tighter">Travel Memories</h2>
-            <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+            <div class="flex items-center gap-4 mb-8 border-b border-gray-100 pb-6">
+                <h2 class="text-3xl font-bold text-gray-900 aboreto-regular tracking-tighter">Travel Memories</h2>
+                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">{{ past_bookings|length }} Experiences</span>
+            </div>
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
                 {% for booking in past_bookings %}
-                    <div class="group flex items-center gap-6 p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-300">
-                        <div class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden grayscale">
-                            {% if booking.booking_type == 'trip' %}
-                                <img src="{{ booking.trip.destination.image.url }}"
-                                     alt="{{ booking.trip.destination.name }}"
-                                     class="w-full h-full object-cover">
-                            {% elif booking.booking_type == 'activity' %}
-                                <img src="{{ booking.activity.image.url }}"
-                                     alt="{{ booking.activity.name }}"
-                                     class="w-full h-full object-cover">
-                            {% elif booking.booking_type == 'package' %}
-                                <img src="{{ booking.package.image.url }}"
-                                     alt="{{ booking.package.name }}"
-                                     class="w-full h-full object-cover">
-                            {% elif booking.booking_type == 'hotel' %}
-                                <img src="{{ booking.hotel.image.url }}"
-                                     alt="{{ booking.hotel.name }}"
-                                     class="w-full h-full object-cover">
-                            {% endif %}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-lg font-semibold text-gray-900 truncate aboreto-regular">
-                                {% if booking.booking_type == 'trip' %}
-                                    {{ booking.trip.name }}
-                                {% elif booking.booking_type == 'activity' %}
-                                    {{ booking.activity.name }}
-                                {% elif booking.booking_type == 'package' %}
-                                    {{ booking.package.name }}
-                                {% elif booking.booking_type == 'hotel' %}
-                                    {{ booking.hotel.name }}
-                                {% endif %}
-                            </h3>
-                            <div class="flex items-center gap-4 mt-2">
-                                <div class="flex items-center gap-2 text-sm text-gray-600 aboreto-regular">
-                                    <i class="fa-regular fa-calendar text-amber-600"></i>
-                                    <span>{{ booking.created_at|date:"M d, Y" }}</span>
-                                </div>
-                                <div class="inline-flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">
-                                    <i class="fa-solid fa-check-circle text-xs"></i>
-                                    <span class="aboreto-regular">Completed Journey</span>
+                    <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                        <div class="flex items-center gap-6 p-6">
+                            <!-- Image Container -->
+                            <div class="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden relative">
+                                <img src="{{ booking.get_booked_instance.image.url }}"
+                                     alt="{{ booking.get_booked_instance.name }}"
+                                     class="w-full h-full object-cover grayscale contrast-75 brightness-110 group-hover:grayscale-0 transition-all duration-500">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                                <div class="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium text-gray-700 shadow-sm">
+                                    {{ booking.get_booking_type_display }}
                                 </div>
                             </div>
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0 space-y-3">
+                                <h3 class="text-xl font-semibold text-gray-900 truncate aboreto-regular">{{ booking.get_booked_instance.name }}</h3>
+                                <div class="flex flex-wrap items-center gap-4">
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <i class="fa-regular fa-clock text-purple-600"></i>
+                                        <span class="font-medium">{{ booking.created_at|date:"M d, Y" }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <i class="fa-solid fa-star text-purple-600"></i>
+                                        <span class="font-medium">
+                                            {% if booking.rating %}
+                                                {{ booking.rating }}/5
+                                            {% else %}
+                                                Not Rated
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">Memory Archived</span>
+                                </div>
+                            </div>
+                            <!-- Action Button -->
+                            <a href="{% url 'booking_detail' booking.id %}"
+                               class="ml-auto self-start p-3 -mr-3 rounded-lg hover:bg-gray-50 transition-colors"
+                               aria-label="View details">
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-lg hover:text-purple-600 transition-colors"></i>
+                            </a>
                         </div>
-                        <a href="{% url 'booking_detail' booking.id %}" class="ml-auto pr-2">
-                            <i class="fa-solid fa-chevron-right text-gray-400 text-lg hover:text-amber-600 transition-colors"></i>
-                        </a>
                     </div>
                 {% empty %}
-                    <div class="text-center py-12 space-y-4">
-                        <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-compass text-3xl text-gray-400"></i>
+                    <div class="col-span-full text-center py-16 space-y-6">
+                        <div class="mx-auto w-48 h-48 bg-gray-50 rounded-full flex items-center justify-center p-8">
+                            <svg class="w-24 h-24 text-gray-400"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
                         </div>
-                        <p class="text-gray-600 text-lg aboreto-regular">Your travel memories await</p>
+                        <div class="space-y-2">
+                            <h3 class="text-2xl font-semibold text-gray-900 aboreto-regular">No Travel Memories Yet</h3>
+                            <p class="text-gray-600 max-w-md mx-auto">Your future adventures will appear here once completed!</p>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
